@@ -12,7 +12,7 @@ import (
 	"github.com/alireza0/s-ui/util/common"
 )
 
-var InboundTypeWithLink = []string{"socks", "http", "mixed", "shadowsocks", "naive", "hysteria", "hysteria2", "anytls", "tuic", "vless", "trojan", "vmess"}
+var InboundTypeWithLink = []string{"socks", "http", "mixed", "shadowsocks", "naive", "hysteria", "hysteria2", "anytls", "tuic", "vless", "trojan", "vmess", "sudoku"}
 
 type LinkParam struct {
 	Key   string
@@ -112,6 +112,8 @@ func LinkGenerator(clientConfig json.RawMessage, i *model.Inbound, hostname stri
 		return trojanLink(userConfig["trojan"], *inbound, Addrs)
 	case "vmess":
 		return vmessLink(userConfig["vmess"], *inbound, Addrs)
+	case "sudoku":
+		return sudokuLink(*inbound, Addrs)
 	}
 
 	return []string{}
@@ -618,6 +620,104 @@ func populateVmessTlsParams(obj map[string]interface{}, tlsConfig interface{}) {
 	} else {
 		obj["tls"] = "none"
 	}
+}
+
+// sudokuLink builds the sudoku:// share link: base64url (unpadded) of a small
+// JSON object. The client key comes from the inbound's out_json -- the private
+// half in split-key mode -- and only falls back to the inbound key.
+func sudokuLink(inbound map[string]interface{}, addrs []map[string]interface{}) []string {
+	key, _ := inbound["key"].(string)
+
+	var outJson map[string]interface{}
+	if raw, ok := inbound["out_json"].(json.RawMessage); ok {
+		_ = json.Unmarshal(raw, &outJson)
+	}
+	if outJson != nil {
+		if k, ok := outJson["key"].(string); ok && k != "" {
+			key = k
+		}
+	}
+
+	// Client-side sudoku settings live in out_json; the inbound options are the
+	// fallback (shared-key mode).
+	field := func(name string) interface{} {
+		if outJson != nil {
+			if v, ok := outJson[name]; ok {
+				return v
+			}
+		}
+		return inbound[name]
+	}
+
+	table, _ := field("ascii").(string)
+	aead, _ := field("aead").(string)
+	enablePure, _ := field("enable_pure_downlink").(bool)
+
+	var tables []string
+	switch v := field("custom_tables").(type) {
+	case []interface{}:
+		for _, item := range v {
+			if s, ok := item.(string); ok && s != "" {
+				tables = append(tables, s)
+			}
+		}
+	case []string:
+		tables = append(tables, v...)
+	}
+	if len(tables) == 0 {
+		if ct, ok := field("custom_table").(string); ok && ct != "" {
+			tables = append(tables, ct)
+		}
+	}
+
+	var httpMaskMode, httpMaskTLS, httpMaskPath string
+	if hm, ok := field("httpmask").(map[string]interface{}); ok {
+		httpMaskMode, _ = hm["mode"].(string)
+		httpMaskPath, _ = hm["path_root"].(string)
+		if tls, ok := hm["tls"].(bool); ok && tls {
+			httpMaskTLS = "on"
+		}
+	}
+
+	var links []string
+	for _, addr := range addrs {
+		server, _ := addr["server"].(string)
+		port, _ := addr["server_port"].(float64)
+		remark, _ := addr["remark"].(string)
+
+		obj := map[string]interface{}{
+			"h": NormalizeHost(server),
+			"p": int(port),
+			"k": key,
+			"n": remark,
+			"x": enablePure,
+		}
+		if table != "" {
+			obj["a"] = table
+		}
+		if aead != "" {
+			obj["e"] = aead
+		}
+		if len(tables) > 0 {
+			obj["ts"] = tables
+		}
+		if httpMaskMode != "" {
+			obj["hm"] = httpMaskMode
+		}
+		if httpMaskTLS != "" {
+			obj["hx"] = httpMaskTLS
+		}
+		if httpMaskPath != "" {
+			obj["hy"] = httpMaskPath
+		}
+
+		payload, err := json.Marshal(obj)
+		if err != nil {
+			continue
+		}
+		links = append(links, "sudoku://"+base64.RawURLEncoding.EncodeToString(payload))
+	}
+	return links
 }
 
 func toBase64(d []byte) string {

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/url"
 	"strings"
@@ -234,5 +235,60 @@ func TestVmessGrpcCarriesTheServiceName(t *testing.T) {
 	}
 	if obj["path"] != "MyService" {
 		t.Errorf("path = %v, want MyService -- the grpc service name was dropped", obj["path"])
+	}
+}
+
+// The sudoku link is base64url(JSON); it must carry the client key from
+// out_json (the private half in split mode), not the inbound's public key, and
+// parse back into a sudoku outbound.
+func TestSudokuLinkRoundTrips(t *testing.T) {
+	inbound := inboundFor(t, "sudoku", map[string]interface{}{
+		"key":                  "the-public-key",
+		"aead":                 "chacha20-poly1305",
+		"ascii":                "prefer_ascii",
+		"enable_pure_downlink": true,
+		"httpmask":             map[string]interface{}{"mode": "ws", "tls": true, "path_root": "aabbcc"},
+	})
+	inbound.OutJson = json.RawMessage(`{"key":"the-private-key","aead":"chacha20-poly1305","ascii":"prefer_entropy","enable_pure_downlink":true,"httpmask":{"mode":"ws","tls":true,"path_root":"aabbcc"}}`)
+
+	links := LinkGenerator(json.RawMessage(`{}`), inbound, "example.test", "someone")
+	if len(links) == 0 {
+		t.Fatal("no sudoku link generated")
+	}
+	link := links[0]
+	if !strings.HasPrefix(link, "sudoku://") {
+		t.Fatalf("link = %q, want a sudoku:// prefix", link)
+	}
+
+	raw, err := base64.RawURLEncoding.DecodeString(strings.TrimPrefix(link, "sudoku://"))
+	if err != nil {
+		t.Fatalf("payload is not base64url: %v", err)
+	}
+	var obj map[string]interface{}
+	if err := json.Unmarshal(raw, &obj); err != nil {
+		t.Fatalf("payload is not JSON: %v", err)
+	}
+	if obj["k"] != "the-private-key" {
+		t.Errorf("k = %v, want the-private-key (the inbound's public key leaked?)", obj["k"])
+	}
+	if obj["h"] != "example.test" || obj["p"] != float64(443) {
+		t.Errorf("host/port = %v/%v, want example.test/443", obj["h"], obj["p"])
+	}
+	if obj["a"] != "prefer_entropy" {
+		t.Errorf("a = %v, want prefer_entropy (from out_json)", obj["a"])
+	}
+	if obj["hm"] != "ws" || obj["hx"] != "on" || obj["hy"] != "aabbcc" {
+		t.Errorf("httpmask = hm:%v hx:%v hy:%v", obj["hm"], obj["hx"], obj["hy"])
+	}
+	if obj["x"] != true {
+		t.Errorf("x = %v, want true", obj["x"])
+	}
+
+	out, _, err := GetOutbound(link, 0)
+	if err != nil {
+		t.Fatalf("GetOutbound: %v", err)
+	}
+	if (*out)["type"] != "sudoku" || (*out)["key"] != "the-private-key" || (*out)["server"] != "example.test" {
+		t.Errorf("round trip = %v", *out)
 	}
 }

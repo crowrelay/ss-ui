@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -33,9 +34,88 @@ func GetOutbound(uri string, i int) (*map[string]interface{}, string, error) {
 			return ss(u, i)
 		case "naive+https", "naive+quic", "http2":
 			return parseNaiveLink(u, i)
+		case "sudoku":
+			return sudokuInboundLink(u, i)
 		}
 	}
 	return nil, "", common.NewError("Unsupported link format")
+}
+
+// sudokuInboundLink parses a sudoku:// share link: base64url (unpadded) JSON
+// carrying the client key and connection settings. It mirrors the payload the
+// sudoku clients accept.
+func sudokuInboundLink(u *url.URL, i int) (*map[string]interface{}, string, error) {
+	payload := u.Host
+	if payload == "" {
+		payload = u.Opaque
+	}
+	payload = strings.TrimPrefix(payload, "//")
+	payload = strings.TrimRight(payload, "=")
+
+	raw, err := base64.RawURLEncoding.DecodeString(payload)
+	if err != nil {
+		return nil, "", common.NewError("invalid sudoku link: ", err)
+	}
+	var data map[string]interface{}
+	if err := json.Unmarshal(raw, &data); err != nil {
+		return nil, "", common.NewError("invalid sudoku payload: ", err)
+	}
+
+	out := map[string]interface{}{"type": "sudoku"}
+	if v, ok := data["h"].(string); ok {
+		out["server"] = v
+	}
+	if v, ok := data["p"].(float64); ok {
+		out["server_port"] = int(v)
+	}
+	if v, ok := data["k"].(string); ok {
+		out["key"] = v
+	}
+	if v, ok := data["a"].(string); ok && v != "" {
+		out["ascii"] = v
+	}
+	if v, ok := data["e"].(string); ok && v != "" {
+		out["aead"] = v
+	}
+	if v, ok := data["x"].(bool); ok {
+		out["enable_pure_downlink"] = v
+	}
+	if items, ok := data["ts"].([]interface{}); ok {
+		var tables []string
+		for _, item := range items {
+			if s, ok := item.(string); ok && s != "" {
+				tables = append(tables, s)
+			}
+		}
+		if len(tables) == 1 {
+			out["custom_table"] = tables[0]
+		} else if len(tables) > 1 {
+			out["custom_tables"] = tables
+		}
+	}
+	httpMask := map[string]interface{}{}
+	if v, ok := data["hm"].(string); ok && v != "" {
+		httpMask["mode"] = v
+	}
+	if v, ok := data["hx"].(string); ok && v != "" {
+		httpMask["tls"] = strings.EqualFold(v, "on")
+	}
+	if v, ok := data["hy"].(string); ok && v != "" {
+		httpMask["path_root"] = v
+	}
+	if len(httpMask) > 0 {
+		out["httpmask"] = httpMask
+	}
+
+	tag, _ := data["n"].(string)
+	if tag == "" {
+		tag, _ = out["server"].(string)
+	}
+	if i > 0 {
+		tag = fmt.Sprintf("%d.%s", i, tag)
+	}
+	out["tag"] = tag
+	return &out, tag, nil
 }
 
 func vmess(data string, i int) (*map[string]interface{}, string, error) {
