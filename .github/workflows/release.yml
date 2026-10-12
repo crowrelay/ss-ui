@@ -221,12 +221,13 @@ jobs:
           if [ "${{ matrix.naive }}" = "true" ]; then PROFILE=release; else PROFILE=test; fi
           TAGS=$(tags_for "$PROFILE")
           LDFLAGS=$(ldflags_for "$PROFILE")
-          go build -ldflags="$LDFLAGS -linkmode external -extldflags '-static'" -tags "$TAGS" -o ss-ui main.go
-          file ss-ui
-          ldd ss-ui 2>/dev/null || echo "Static binary confirmed"
-
-          mkdir ss-ui
-          cp ss-ui ss-ui/
+          # The package directory is named ss-ui, the same as the binary, so
+          # create it first and build straight into it; a later mkdir ss-ui
+          # would collide with the binary file of that name.
+          mkdir -p ss-ui
+          go build -ldflags="$LDFLAGS -linkmode external -extldflags '-static'" -tags "$TAGS" -o ss-ui/ss-ui main.go
+          file ss-ui/ss-ui
+          ldd ss-ui/ss-ui 2>/dev/null || echo "Static binary confirmed"
           cp ss-ui.service ss-ui/
           cp ss-ui.sh ss-ui/
 
