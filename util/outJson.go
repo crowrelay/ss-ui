@@ -62,6 +62,8 @@ func FillOutJson(i *model.Inbound, hostname string) error {
 		trojanOut(&outJson, *inbound)
 	case "vmess":
 		vmessOut(&outJson, *inbound)
+	case "sudoku":
+		sudokuOut(&outJson, *inbound)
 	default:
 		for key := range outJson {
 			delete(outJson, key)
@@ -275,5 +277,33 @@ func vmessOut(out *map[string]interface{}, inbound map[string]interface{}) {
 	delete(*out, "transport")
 	if transport, ok := inbound["transport"]; ok {
 		(*out)["transport"] = transport
+	}
+}
+
+// sudokuOut copies the client-relevant Sudoku fields onto the outbound a
+// subscriber receives. The inbound's key is only used as a default: in
+// split-key mode the inbound carries the public key and the client needs a
+// different private key, so a key the operator set in out_json wins.
+func sudokuOut(out *map[string]interface{}, inbound map[string]interface{}) {
+	// Server-only knobs that must not travel to the client.
+	delete(*out, "handshake_timeout")
+	delete(*out, "fallback_address")
+	delete(*out, "suspicious_action")
+	delete(*out, "reverse")
+
+	for _, key := range []string{
+		"key", "aead", "ascii", "custom_table", "custom_tables",
+		"padding_min", "padding_max", "enable_pure_downlink", "multiplex",
+		"httpmask",
+	} {
+		if value, ok := inbound[key]; ok {
+			(*out)[key] = value
+		}
+	}
+
+	if inboundKey, ok := inbound["key"].(string); ok {
+		if existing, _ := (*out)["key"].(string); existing == "" {
+			(*out)["key"] = inboundKey
+		}
 	}
 }

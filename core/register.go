@@ -41,6 +41,7 @@ import (
 	"github.com/sagernet/sing-box/protocol/snell"
 	"github.com/sagernet/sing-box/protocol/socks"
 	"github.com/sagernet/sing-box/protocol/ssh"
+	sbSudoku "github.com/sagernet/sing-box/protocol/sudoku"
 	"github.com/sagernet/sing-box/protocol/tor"
 	"github.com/sagernet/sing-box/protocol/trojan"
 	"github.com/sagernet/sing-box/protocol/tuic"
@@ -74,6 +75,7 @@ func InboundRegistry() *inbound.Registry {
 	suiVmess.RegisterInbound(registry)
 	suiTrojan.RegisterInbound(registry)
 	naive.RegisterInbound(registry)
+	sbSudoku.RegisterInbound(registry)
 	shadowtls.RegisterInbound(registry)
 	suiVless.RegisterInbound(registry)
 	suiAnytls.RegisterInbound(registry)
@@ -110,6 +112,7 @@ func OutboundRegistry() *outbound.Registry {
 	shadowtls.RegisterOutbound(registry)
 	vless.RegisterOutbound(registry)
 	anytls.RegisterOutbound(registry)
+	sbSudoku.RegisterOutbound(registry)
 
 	hysteria.RegisterOutbound(registry)
 	tuic.RegisterOutbound(registry)

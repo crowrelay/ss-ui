@@ -221,23 +221,23 @@ jobs:
           if [ "${{ matrix.naive }}" = "true" ]; then PROFILE=release; else PROFILE=test; fi
           TAGS=$(tags_for "$PROFILE")
           LDFLAGS=$(ldflags_for "$PROFILE")
-          go build -ldflags="$LDFLAGS -linkmode external -extldflags '-static'" -tags "$TAGS" -o sui main.go
-          file sui
-          ldd sui 2>/dev/null || echo "Static binary confirmed"
+          go build -ldflags="$LDFLAGS -linkmode external -extldflags '-static'" -tags "$TAGS" -o ss-ui main.go
+          file ss-ui
+          ldd ss-ui 2>/dev/null || echo "Static binary confirmed"
 
-          mkdir s-ui
-          cp sui s-ui/
-          cp s-ui.service s-ui/
-          cp s-ui.sh s-ui/
+          mkdir ss-ui
+          cp ss-ui ss-ui/
+          cp ss-ui.service ss-ui/
+          cp ss-ui.sh ss-ui/
 
       - name: Package
-        run: tar -zcvf s-ui-linux-${{ matrix.platform }}.tar.gz s-ui
+        run: tar -zcvf ss-ui-linux-${{ matrix.platform }}.tar.gz ss-ui
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: s-ui-linux-${{ matrix.platform }}
-          path: ./s-ui-linux-${{ matrix.platform }}.tar.gz
+          name: ss-ui-linux-${{ matrix.platform }}
+          path: ./ss-ui-linux-${{ matrix.platform }}.tar.gz
           retention-days: 30
 
   build-windows:
@@ -306,12 +306,12 @@ jobs:
           . ./build-tags.sh
           TAGS=$(tags_for windows)
           LDFLAGS=$(ldflags_for windows)
-          go build -ldflags="$LDFLAGS" -tags "$TAGS" -o sui.exe main.go
-          file sui.exe
+          go build -ldflags="$LDFLAGS" -tags "$TAGS" -o ss-ui.exe main.go
+          file ss-ui.exe
           
-          mkdir s-ui-windows
-          cp sui.exe s-ui-windows/
-          cp -r windows/* s-ui-windows/
+          mkdir ss-ui-windows
+          cp ss-ui.exe ss-ui-windows/
+          cp -r windows/* ss-ui-windows/
 
       - name: Save Go module cache
         if: runner.os == 'Windows' && steps.go-mod-cache.outputs.cache-hit != 'true'
@@ -323,18 +323,18 @@ jobs:
       - name: Download libcronet-go
         shell: bash
         run: |
-          curl -qsL -o s-ui-windows/libcronet.dll ${{ env.LIBCRONET_BASE_URL }}/libcronet-windows-${{ matrix.arch }}.dll
+          curl -qsL -o ss-ui-windows/libcronet.dll ${{ env.LIBCRONET_BASE_URL }}/libcronet-windows-${{ matrix.arch }}.dll
 
       - name: Package
         shell: bash
         run: |
-          zip -r "s-ui-windows-${{ matrix.arch }}.zip" s-ui-windows
+          zip -r "ss-ui-windows-${{ matrix.arch }}.zip" ss-ui-windows
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: s-ui-windows-${{ matrix.arch }}
-          path: ./s-ui-windows-${{ matrix.arch }}.zip
+          name: ss-ui-windows-${{ matrix.arch }}
+          path: ./ss-ui-windows-${{ matrix.arch }}.zip
           retention-days: 30
 
   # One place that touches the release, reached only once every build has
@@ -356,7 +356,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          pattern: s-ui-*
+          pattern: ss-ui-*
           merge-multiple: true
           path: dist
 

@@ -37,7 +37,7 @@ RUN if [ "$TARGETARCH" = "arm" ]; then export GOARM=7; [ "$TARGETVARIANT" = "v6"
     . ./build-tags.sh && \
     TAGS=$(tags_for docker) && \
     LDFLAGS=$(ldflags_for docker) && \
-    go build -ldflags="$LDFLAGS" -tags "$TAGS" -o sui main.go
+    go build -ldflags="$LDFLAGS" -tags "$TAGS" -o ss-ui main.go
 
 FROM alpine:3
 LABEL org.opencontainers.image.authors="alireza7@gmail.com"
@@ -45,16 +45,16 @@ ENV TZ=Asia/Tehran
 WORKDIR /app
 RUN set -ex && apk upgrade --no-cache --scripts=no apk-tools && \
     apk add --no-cache --upgrade bash ca-certificates nftables su-exec && \
-    addgroup -S -g 10001 sui && \
-    adduser -S -u 10001 -G sui -h /app -s /sbin/nologin sui
-COPY --from=backend-builder /app/sui /app/libcronet.so /app/
+    addgroup -S -g 10001 ss-ui && \
+    adduser -S -u 10001 -G ss-ui -h /app -s /sbin/nologin ss-ui
+COPY --from=backend-builder /app/ss-ui /app/libcronet.so /app/
 COPY entrypoint.sh /app/
 
 # Asks the binary, which reads the port the operator actually configured. A
 # check with the port written in here goes red the moment they change it in the
 # panel, and an orchestrator then kills a container that was working.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD ["./sui", "healthcheck"]
+    CMD ["./ss-ui", "healthcheck"]
 
 # The container still starts as root by default: a TUN inbound needs
 # CAP_NET_ADMIN in the process's permitted set, and a panel port below 1024

@@ -53,7 +53,7 @@ func (s *WarpService) RegisterWarp(ep *model.Endpoint) error {
 	publicKey := privateKey.PublicKey().String()
 	hostName, _ := os.Hostname()
 
-	data := fmt.Sprintf(`{"key":"%s","tos":"%s","type": "PC","model": "s-ui", "name": "%s"}`, publicKey, tos, hostName)
+	data := fmt.Sprintf(`{"key":"%s","tos":"%s","type": "PC","model": "ss-ui", "name": "%s"}`, publicKey, tos, hostName)
 	url := "https://api.cloudflareclient.com/v0a2158/reg"
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))

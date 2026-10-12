@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <service>
-  <id>s-ui</id>
-  <name>S-UI Proxy Panel</name>
-  <description>S-UI is a proxy panel for managing proxy services</description>
-  <executable>%BASE%\sui.exe</executable>
+  <id>ss-ui</id>
+  <name>SS-UI Proxy Panel</name>
+  <description>SS-UI is a proxy panel for managing proxy services (sing-box sudoku core)</description>
+  <executable>%BASE%\ss-ui.exe</executable>
   <arguments></arguments>
   <logmode>rotate</logmode>
   <logpath>%BASE%\logs</logpath>

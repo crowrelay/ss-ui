@@ -114,7 +114,7 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	// response rewrote the cookie as a session cookie, so "remember me" lasted
 	// until the browser was closed whatever the operator configured.
 	store.Options(api.BaseSessionOptions(sessionMaxAge))
-	engine.Use(sessions.Sessions("s-ui", store))
+	engine.Use(sessions.Sessions("ss-ui", store))
 
 	engine.Use(func(c *gin.Context) {
 		uri := c.Request.RequestURI

@@ -1,315 +1,98 @@
-# S-UI
-**An Advanced Web Panel • Built on SagerNet/Sing-Box**
+# ss-ui
 
-![](https://img.shields.io/github/v/release/alireza0/s-ui.svg)
-![S-UI Docker pull](https://img.shields.io/docker/pulls/alireza7/s-ui.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/alireza0/s-ui)](https://goreportcard.com/report/github.com/alireza0/s-ui)
-[![Downloads](https://img.shields.io/github/downloads/alireza0/s-ui/total.svg)](https://img.shields.io/github/downloads/alireza0/s-ui/total.svg)
-[![License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+**An advanced web panel for the [Sudoku](https://github.com/SUDOKU-ASCII/sudoku) sing-box core**
 
-> **Disclaimer:** This project is only for personal learning and communication, please do not use it for illegal purposes, please do not use it in a production environment
+ss-ui is a fork of [s-ui](https://github.com/alireza0/s-ui) that is built against the
+[`sudoku-sing-box`](https://github.com/SUDOKU-ASCII/sudoku-sing-box) core (sing-box 1.14.2
++ the Sudoku protocol) instead of the official sing-box core. The core is linked into the
+`ss-ui` binary as a library, so one executable is the whole product.
 
-**If you think this project is helpful to you, you may wish to give a**:star2:
+📖 **Documentation:** [English](docs/en/README.md) · [فارسی](docs/fa/README.md)
 
-**Want to contribute?** See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding conventions, testing, and the pull request process.
+> **Disclaimer:** This project is for personal learning and communication. Do not use it
+> for illegal purposes.
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/alireza7)
+## Quick overview
 
-<a href="https://nowpayments.io/donation/alireza7" target="_blank" rel="noreferrer noopener">
-   <img src="https://nowpayments.io/images/embeds/donation-button-white.svg" alt="Crypto donation button by NOWPayments">
-</a>
+| Features | Enabled |
+|----------|:-------:|
+| **Sudoku protocol (inbound + outbound)** | ✅ |
+| Multi-Protocol | ✅ |
+| Multi-Language | ✅ |
+| Multi-Client / Inbound | ✅ |
+| Advanced Traffic Routing | ✅ |
+| Client, traffic & system status | ✅ |
+| Subscription (link / json / clash + info) | ✅ |
+| Dark / Light theme | ✅ |
+| REST API | ✅ |
 
-## Quick Overview
-| Features                               |      Enable?       |
-| -------------------------------------- | :----------------: |
-| Multi-Protocol                         | :heavy_check_mark: |
-| Multi-Language                         | :heavy_check_mark: |
-| Multi-Client/Inbound                   | :heavy_check_mark: |
-| Advanced Traffic Routing Interface     | :heavy_check_mark: |
-| Client & Traffic & System Status       | :heavy_check_mark: |
-| Subscription Link (link/json/clash + info)| :heavy_check_mark: |
-| Dark/Light Theme                       | :heavy_check_mark: |
-| API Interface                          | :heavy_check_mark: |
+## Supported platforms
 
-## Supported Platforms
 | Platform | Architecture | Status |
-|----------|--------------|---------|
-| Linux    | amd64, arm64, armv7, armv6, armv5, 386, s390x | ✅ Supported |
-| Windows  | amd64, 386, arm64 | ✅ Supported |
-| macOS    | amd64, arm64 | 🚧 Experimental |
+|----------|--------------|--------|
+| Linux | amd64, arm64, armv7, armv6, armv5, 386, s390x | ✅ Supported |
+| Windows | amd64, 386, arm64 | ✅ Supported |
+| macOS | amd64, arm64 | 🚧 Experimental |
 
-## Screenshots
+## Install
 
-!["Main"](https://github.com/alireza0/s-ui-frontend/raw/main/media/main.png)
-
-[Other UI Screenshots](https://github.com/alireza0/s-ui-frontend/blob/main/screenshots.md)
-
-## Documentation
-
-Full documentation lives in the [Wiki](https://github.com/alireza0/s-ui/wiki):
-
-| Page | Contents |
-|------|----------|
-| [Subscription Service](https://github.com/alireza0/s-ui/wiki/Subscription-Service) | Subscription URLs, the three formats, response headers |
-| [Subscription JSON Template](https://github.com/alireza0/s-ui/wiki/Subscription-JSON-Template) | Structure and supported keys of the sing-box subscription template |
-| [Subscription Clash Template](https://github.com/alireza0/s-ui/wiki/Subscription-Clash-Template) | The Clash.Meta template, proxy groups and filters |
-| [API Documentation](https://github.com/alireza0/s-ui/wiki/API-Documentation) | The token-authenticated REST API (`/apiv2`) |
-| [Configuration Objects](https://github.com/alireza0/s-ui/wiki/Configuration-Objects) | Shape of the objects read and written through the API |
-| [Settings Reference](https://github.com/alireza0/s-ui/wiki/Settings-Reference) | Every panel setting and its default |
-
-## Default Installation Information
-- Panel Port: 2095
-- Panel Path: /app/
-- Subscription Port: 2096
-- Subscription Path: /sub/
-- User/Password: admin
-
-## Install & Upgrade to Latest Version
-
-### Linux/macOS
-```sh
-bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)
-```
-
-#### Installer language
-
-The installer is available in the same six languages as the panel: `en` (default), `fa`, `ru`, `vi`, `zhcn`, `zhtw`. Choose one with the `SUI_LANG` environment variable (when unset, your system `$LANG` is used as a hint):
+Linux / macOS:
 
 ```sh
-SUI_LANG=fa bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/crowrelay/ss-ui/main/install.sh)
 ```
 
-### Alpine Linux
-Alpine uses `apk` and OpenRC instead of `apt`/systemd. The install script detects Alpine automatically and sets up an OpenRC service. Since Alpine has no `bash` by default, install it first:
+Alpine Linux (OpenRC): `apk add bash` first, then run the same command.
+
+Docker:
 
 ```sh
-apk add bash
-bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)
-```
-
-Manage the service with OpenRC: `rc-service s-ui start|stop|restart` and `rc-update add s-ui default`.
-
-### Windows
-1. Download the latest Windows release from [GitHub Releases](https://github.com/alireza0/s-ui/releases/latest)
-2. Extract the ZIP file
-3. Run `install-windows.bat` as Administrator
-4. Follow the installation wizard
-
-## Install legacy Version
-
-**Step 1:** To install your desired legacy version, add the version to the end of the installation command. e.g., ver `v1.5.0`:
-
-```sh
-VERSION=v1.5.0 && bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/$VERSION/install.sh) $VERSION
-```
-
-## Manual installation
-
-### Linux/macOS
-1. Get the latest version of S-UI based on your OS/Architecture from GitHub: [https://github.com/alireza0/s-ui/releases/latest](https://github.com/alireza0/s-ui/releases/latest)
-2. **OPTIONAL** Get the latest version of `s-ui.sh` [https://raw.githubusercontent.com/alireza0/s-ui/master/s-ui.sh](https://raw.githubusercontent.com/alireza0/s-ui/master/s-ui.sh)
-3. **OPTIONAL** Copy `s-ui.sh` to /usr/bin/ and run `chmod +x /usr/bin/s-ui`.
-4. Extract s-ui tar.gz file to a directory of your choice and navigate to the directory where you extracted the tar.gz file.
-5. Copy *.service files to /etc/systemd/system/ and run `systemctl daemon-reload`.
-6. Enable autostart and start S-UI service using `systemctl enable s-ui --now`
-7. Start sing-box service using `systemctl enable sing-box --now`
-
-### Windows
-1. Get the latest Windows version from GitHub: [https://github.com/alireza0/s-ui/releases/latest](https://github.com/alireza0/s-ui/releases/latest)
-2. Download the appropriate Windows package (e.g., `s-ui-windows-amd64.zip`)
-3. Extract the ZIP file to a directory of your choice
-4. Run `install-windows.bat` as Administrator
-5. Follow the installation wizard
-6. Access the panel at http://localhost:2095/app
-
-## Uninstall S-UI
-
-### systemd
-```sh
-sudo -i
-
-systemctl disable s-ui  --now
-
-rm -f /etc/systemd/system/sing-box.service
-systemctl daemon-reload
-
-rm -fr /usr/local/s-ui
-rm /usr/bin/s-ui
-```
-
-### Alpine (OpenRC)
-```sh
-rc-service s-ui stop
-rc-update del s-ui default
-rm -f /etc/init.d/s-ui
-
-rm -fr /usr/local/s-ui
-rm /usr/bin/s-ui
-```
-
-## Install using Docker
-
-<details>
-   <summary>Click for details</summary>
-
-### Usage
-
-**Step 1:** Install Docker
-
-```shell
-curl -fsSL https://get.docker.com | sh
-```
-
-**Step 2:** Install S-UI
-
-> Docker compose method
-
-```shell
-mkdir s-ui && cd s-ui
-wget -q https://raw.githubusercontent.com/alireza0/s-ui/master/docker-compose.yml
+mkdir ss-ui && cd ss-ui
+wget -q https://raw.githubusercontent.com/crowrelay/ss-ui/main/docker-compose.yml
 docker compose up -d
 ```
 
-> Use docker
+Windows: download `ss-ui-windows-<arch>.zip` from the releases page and run
+`install-windows.bat` as Administrator.
 
-```shell
-mkdir s-ui && cd s-ui
-docker run -itd \
-    -p 2095:2095 -p 2096:2096 -p 443:443 -p 80:80 \
-    -v $PWD/db/:/app/db/ \
-    -v $PWD/cert/:/root/cert/ \
-    --name s-ui --restart=unless-stopped \
-    alireza7/s-ui:latest
-```
+Full instructions (per OS, from source, and the Sudoku field reference) are in the
+[documentation](docs/en/README.md).
 
-> Build your own image
+## Default installation information
 
-```shell
-git clone https://github.com/alireza0/s-ui
-git submodule update --init --recursive
-docker build -t s-ui .
-```
+- Panel port: **2095**  · Panel path: `/app/`
+- Subscription port: **2096**  · Subscription path: `/sub/`
+- User / password: **admin** / **admin** (change it immediately)
 
-</details>
+## Using Sudoku
 
-## Manual run ( contribution )
+1. Create an inbound of type **Sudoku**.
+2. Generate a key pair — the panel's refresh button or `./ss-ui generate sudoku-keypair`.
+3. Use the **same** key on both sides (shared-key mode), or the **public** key inbound /
+   **private** key client (split-key mode).
+4. Assign the inbound to a client and share the subscription.
 
-<details>
-   <summary>Click for details</summary>
+See the [English](docs/en/README.md#4-first-run-and-creating-a-sudoku-inbound) or
+[Persian](docs/fa/README.md) docs for every field and for the two-layer fallback setup.
 
-### Build and run whole project
-```shell
-./runSUI.sh
-```
+## Automatic updates
 
-### Clone the repository
-```shell
-# clone repository
-git clone https://github.com/alireza0/s-ui
-# clone submodules
-git submodule update --init --recursive
-```
+`.github/workflows/sync-upstream.yml` runs daily: it bumps the `sudoku-sing-box` pin,
+merges the latest `alireza0/s-ui` (best-effort, `-X ours`), builds, and — if the build
+passes — tags a release that `release.yml` publishes for every platform.
 
+## Repository layout
 
-### - Frontend
-
-Visit [s-ui-frontend](https://github.com/alireza0/s-ui-frontend) for frontend code
-
-### - Backend
-> Please build frontend once before!
-
-To build backend:
-```shell
-# remove old frontend compiled files
-rm -fr web/html/*
-# apply new frontend compiled files
-cp -R frontend/dist/ web/html/
-# build
-go build -o sui main.go
-```
-
-To run backend (from root folder of repository):
-```shell
-./sui
-```
-
-</details>
+- The Go module path is still `github.com/alireza0/s-ui` (upstream), so automatic merges
+  from s-ui stay clean. User-facing names, the binary, service, install paths and release
+  assets are **ss-ui**.
+- The `frontend/` directory is a git submodule of a fork of `s-ui-frontend` carrying the
+  Sudoku UI. It is marked `merge=ours` in `.gitattributes`.
 
 ## Languages
 
-- English
-- Farsi
-- Vietnamese
-- Chinese (Simplified)
-- Chinese (Traditional)
-- Russian
+English · Farsi · Vietnamese · Chinese (Simplified) · Chinese (Traditional) · Russian
 
-## Features
+## License
 
-- Supported protocols:
-  - General:  Mixed, SOCKS, HTTP, HTTPS, Direct, Redirect, TProxy
-  - V2Ray based: VLESS, VMess, Trojan, Shadowsocks
-  - Other protocols: ShadowTLS, Hysteria, Hysteria2, Naive, TUIC
-- Supports XTLS protocols
-- An advanced interface for routing traffic, incorporating PROXY Protocol, External, and Transparent Proxy, SSL Certificate, and Port
-- An advanced interface for inbound and outbound configuration
-- Clients’ traffic cap and expiration date
-- Displays online clients, inbounds and outbounds with traffic statistics, and system status monitoring
-- Subscription service with ability to add external links and subscription
-- HTTPS for secure access to the web panel and subscription service (self-provided domain + SSL certificate)
-- Dark/Light theme
-
-## Environment Variables
-
-<details>
-  <summary>Click for details</summary>
-
-### Usage
-
-| Variable       |                      Type                      | Default       |
-| -------------- | :--------------------------------------------: | :------------ |
-| SUI_LOG_LEVEL  | `"debug"` \| `"info"` \| `"warn"` \| `"error"` | `"info"`      |
-| SUI_DEBUG      |                   `boolean`                    | `false`       |
-| SUI_BIN_FOLDER |                    `string`                    | `"bin"`       |
-| SUI_DB_FOLDER  |                    `string`                    | `"db"`        |
-| SINGBOX_API    |                    `string`                    | -             |
-
-</details>
-
-## SSL Certificate
-
-<details>
-  <summary>Click for details</summary>
-
-### Certbot
-
-```bash
-snap install core; snap refresh core
-snap install --classic certbot
-ln -s /snap/bin/certbot /usr/bin/certbot
-
-certbot certonly --standalone --register-unsafely-without-email --non-interactive --agree-tos -d <Your Domain Name>
-```
-
-</details>
-
-## Third-party Projects
-
-Community-made projects built around S-UI. These are not affiliated with or maintained by S-UI — use them at your own discretion:
-
-- [itning/reset-s-ui-traffic](https://github.com/itning/reset-s-ui-traffic) — periodic traffic reset for all users
-- [zqh2333/s-ui-traffic-reset](https://github.com/zqh2333/s-ui-traffic-reset) — traffic reset tool
-- [Sownix21/SUI-Bot](https://github.com/Sownix21/SUI-Bot) - telegram bot
-- [Android App](https://github.com/Sownix21/SUI-Node) - multi panel controller
-
-> Building something on top of S-UI (a Telegram bot, monitoring, automation, ...)? Open an issue/PR to get it listed here.
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=alireza0%2Fs-ui&type=date&releases=&legend=bottom-right">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=alireza0/s-ui&type=date&theme=dark&legend=bottom-right" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=alireza0/s-ui&type=date&legend=bottom-right" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=alireza0/s-ui&type=date&legend=bottom-right" />
- </picture>
-</a>
+GPLv3, as upstream. See [LICENSE](LICENSE).

@@ -5,6 +5,10 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
+# Repository hosting the ss-ui releases and this script. Override for a
+# self-hosted fork: SS_UI_REPO=owner/repo ss-ui
+SS_UI_REPO="${SS_UI_REPO:-crowrelay/ss-ui}"
+
 function LOGD() {
     echo -e "${yellow}[DEG] $* ${plain}"
 }
@@ -50,7 +54,7 @@ svc_restart() { if [[ "${init_system}" == "openrc" ]]; then rc-service "$1" rest
 svc_status()  { if [[ "${init_system}" == "openrc" ]]; then rc-service "$1" status; else systemctl status "$1" -l; fi; }
 svc_enable()  { if [[ "${init_system}" == "openrc" ]]; then rc-update add "$1" default; else systemctl enable "$1"; fi; }
 svc_disable() { if [[ "${init_system}" == "openrc" ]]; then rc-update del "$1" default; else systemctl disable "$1"; fi; }
-svc_log()     { if [[ "${init_system}" == "openrc" ]]; then tail -n 200 -f /var/log/s-ui.log; else journalctl -u "$1".service -e --no-pager -f; fi; }
+svc_log()     { if [[ "${init_system}" == "openrc" ]]; then tail -n 200 -f /var/log/ss-ui.log; else journalctl -u "$1".service -e --no-pager -f; fi; }
 
 confirm() {
     if [[ $# > 1 ]]; then
@@ -83,7 +87,7 @@ before_show_menu() {
 }
 
 install() {
-    bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/main/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/${SS_UI_REPO}/main/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -102,7 +106,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/main/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/${SS_UI_REPO}/main/install.sh)
     if [[ $? == 0 ]]; then
         LOGI "Update is complete, Panel has automatically restarted "
         exit 0
@@ -118,7 +122,7 @@ custom_version() {
     exit 1
     fi
 
-    download_link="https://raw.githubusercontent.com/alireza0/s-ui/main/install.sh"
+    download_link="https://raw.githubusercontent.com/${SS_UI_REPO}/main/install.sh"
 
     install_command="bash <(curl -Ls $download_link) $panel_version"
 
@@ -135,21 +139,21 @@ uninstall() {
         return 0
     fi
     if [[ "${init_system}" == "openrc" ]]; then
-        rc-service s-ui stop
-        rc-update del s-ui default
-        rm /etc/init.d/s-ui -f
+        rc-service ss-ui stop
+        rc-update del ss-ui default
+        rm /etc/init.d/ss-ui -f
     else
-        systemctl stop s-ui
-        systemctl disable s-ui
-        rm /etc/systemd/system/s-ui.service -f
+        systemctl stop ss-ui
+        systemctl disable ss-ui
+        rm /etc/systemd/system/ss-ui.service -f
         systemctl daemon-reload
         systemctl reset-failed
     fi
-    rm /etc/s-ui/ -rf
-    rm /usr/local/s-ui/ -rf
+    rm /etc/ss-ui/ -rf
+    rm /usr/local/ss-ui/ -rf
 
     echo ""
-    echo -e "Uninstalled Successfully, If you want to remove this script, then after exiting the script run ${green}rm /usr/local/s-ui -f${plain} to delete it."
+    echo -e "Uninstalled Successfully, If you want to remove this script, then after exiting the script run ${green}rm /usr/local/ss-ui -f${plain} to delete it."
     echo ""
 
     if [[ $# == 0 ]]; then
@@ -161,7 +165,7 @@ reset_admin() {
     echo "It is not recommended to set admin's credentials to default!"
     confirm "Are you sure you want to reset admin's credentials to default ?" "n"
     if [[ $? == 0 ]]; then
-        /usr/local/s-ui/sui admin -reset
+        /usr/local/ss-ui/ss-ui admin -reset
     fi
     before_show_menu
 }
@@ -170,19 +174,19 @@ set_admin() {
     echo "It is not recommended to set admin's credentials to a complex text."
     read -p "Please set up your username:" config_account
     read -p "Please set up your password:" config_password
-    /usr/local/s-ui/sui admin -username ${config_account} -password ${config_password}
+    /usr/local/ss-ui/ss-ui admin -username ${config_account} -password ${config_password}
     before_show_menu
 }
 
 view_admin() {
-    /usr/local/s-ui/sui admin -show
+    /usr/local/ss-ui/ss-ui admin -show
     before_show_menu
 }
 
 reset_setting() {
     confirm "Are you sure you want to reset settings to default ?" "n"
     if [[ $? == 0 ]]; then
-        /usr/local/s-ui/sui setting -reset
+        /usr/local/ss-ui/ss-ui setting -reset
     fi
     before_show_menu
 }
@@ -204,18 +208,18 @@ set_setting() {
     [ -z "$config_path" ] || params="$params -path $config_path"
     [ -z "$config_subPort" ] || params="$params -subPort $config_subPort"
     [ -z "$config_subPath" ] || params="$params -subPath $config_subPath"
-    /usr/local/s-ui/sui setting ${params}
+    /usr/local/ss-ui/ss-ui setting ${params}
     before_show_menu
 }
 
 view_setting() {
-    /usr/local/s-ui/sui setting -show
+    /usr/local/ss-ui/ss-ui setting -show
     view_uri
     before_show_menu
 }
 
 view_uri() {
-    info=$(/usr/local/s-ui/sui uri)
+    info=$(/usr/local/ss-ui/ss-ui uri)
     if [[ $? != 0 ]]; then
         LOGE "Get current uri error"
         before_show_menu
@@ -281,7 +285,7 @@ restart() {
 }
 
 status() {
-    svc_status s-ui
+    svc_status ss-ui
     if [[ $# == 0 ]]; then
         before_show_menu
     fi
@@ -322,14 +326,14 @@ show_log() {
 
 update_shell() {
     # Certificate verification stays on: this file is about to be installed as
-    # /usr/bin/s-ui and run as root.
-    wget -O /usr/bin/s-ui -N https://github.com/alireza0/s-ui/raw/main/s-ui.sh
+    # /usr/bin/ss-ui and run as root.
+    wget -O /usr/bin/ss-ui -N https://github.com/${SS_UI_REPO}/raw/main/ss-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
         LOGE "Failed to download script, Please check whether the machine can connect Github"
         before_show_menu
     else
-        chmod +x /usr/bin/s-ui
+        chmod +x /usr/bin/ss-ui
         LOGI "Upgrade script succeeded, Please rerun the script" && exit 0
     fi
 }
@@ -373,7 +377,7 @@ check_enabled() {
 }
 
 check_uninstall() {
-    check_status s-ui
+    check_status ss-ui
     if [[ $? != 2 ]]; then
         echo ""
         LOGE "Panel is already installed, Please do not reinstall"
@@ -387,7 +391,7 @@ check_uninstall() {
 }
 
 check_install() {
-    check_status s-ui
+    check_status ss-ui
     if [[ $? == 2 ]]; then
         echo ""
         LOGE "Please install the panel first"
@@ -426,8 +430,8 @@ show_enable_status() {
     fi
 }
 
-check_s-ui_status() {
-    count=$(ps -ef | grep "sui" | grep -v "grep" | wc -l)
+check_ss-ui_status() {
+    count=$(ps -ef | grep "ss-ui" | grep -v "grep" | wc -l)
     if [[ count -ne 0 ]]; then
         return 0
     else
@@ -435,12 +439,12 @@ check_s-ui_status() {
     fi
 }
 
-show_s-ui_status() {
-    check_s-ui_status
+show_ss-ui_status() {
+    check_ss-ui_status
     if [[ $? == 0 ]]; then
-        echo -e "s-ui state: ${green}Running${plain}"
+        echo -e "ss-ui state: ${green}Running${plain}"
     else
-        echo -e "s-ui state: ${red}Not Running${plain}"
+        echo -e "ss-ui state: ${red}Not Running${plain}"
     fi
 }
 
@@ -882,27 +886,27 @@ generate_self_signed_cert() {
 }
 
 show_usage() {
-    echo -e "S-UI Control Menu Usage"
+    echo -e "SS-UI Control Menu Usage"
     echo -e "------------------------------------------"
     echo -e "SUBCOMMANDS:" 
-    echo -e "s-ui              - Admin Management Script"
-    echo -e "s-ui start        - Start s-ui"
-    echo -e "s-ui stop         - Stop s-ui"
-    echo -e "s-ui restart      - Restart s-ui"
-    echo -e "s-ui status       - Current Status of s-ui"
-    echo -e "s-ui enable       - Enable Autostart on OS Startup"
-    echo -e "s-ui disable      - Disable Autostart on OS Startup"
-    echo -e "s-ui log          - Check s-ui Logs"
-    echo -e "s-ui update       - Update"
-    echo -e "s-ui install      - Install"
-    echo -e "s-ui uninstall    - Uninstall"
-    echo -e "s-ui help         - Control Menu Usage"
+    echo -e "ss-ui              - Admin Management Script"
+    echo -e "ss-ui start        - Start ss-ui"
+    echo -e "ss-ui stop         - Stop ss-ui"
+    echo -e "ss-ui restart      - Restart ss-ui"
+    echo -e "ss-ui status       - Current Status of ss-ui"
+    echo -e "ss-ui enable       - Enable Autostart on OS Startup"
+    echo -e "ss-ui disable      - Disable Autostart on OS Startup"
+    echo -e "ss-ui log          - Check ss-ui Logs"
+    echo -e "ss-ui update       - Update"
+    echo -e "ss-ui install      - Install"
+    echo -e "ss-ui uninstall    - Uninstall"
+    echo -e "ss-ui help         - Control Menu Usage"
     echo -e "------------------------------------------"
 }
 
 show_menu() {
   echo -e "
-  ${green}S-UI Admin Management Script ${plain}
+  ${green}SS-UI Admin Management Script ${plain}
 ————————————————————————————————
   ${green}0.${plain} Exit
 ————————————————————————————————
@@ -919,20 +923,20 @@ show_menu() {
   ${green}9.${plain} Set Panel settings
   ${green}10.${plain} View Panel Settings
 ————————————————————————————————
-  ${green}11.${plain} S-UI Start
-  ${green}12.${plain} S-UI Stop
-  ${green}13.${plain} S-UI Restart
-  ${green}14.${plain} S-UI Check State
-  ${green}15.${plain} S-UI Check Logs
-  ${green}16.${plain} S-UI Enable Autostart
-  ${green}17.${plain} S-UI Disable Autostart
+  ${green}11.${plain} SS-UI Start
+  ${green}12.${plain} SS-UI Stop
+  ${green}13.${plain} SS-UI Restart
+  ${green}14.${plain} SS-UI Check State
+  ${green}15.${plain} SS-UI Check Logs
+  ${green}16.${plain} SS-UI Enable Autostart
+  ${green}17.${plain} SS-UI Disable Autostart
 ————————————————————————————————
   ${green}18.${plain} Enable or Disable BBR
   ${green}19.${plain} SSL Certificate Management
   ${green}20.${plain} Cloudflare SSL Certificate
 ————————————————————————————————
  "
-    show_status s-ui
+    show_status ss-ui
     echo && read -p "Please enter your selection [0-20]: " num
 
     case "${num}" in
@@ -970,25 +974,25 @@ show_menu() {
         check_install && view_setting
         ;;
     11)
-        check_install && start s-ui
+        check_install && start ss-ui
         ;;
     12)
-        check_install && stop s-ui
+        check_install && stop ss-ui
         ;;
     13)
-        check_install && restart s-ui
+        check_install && restart ss-ui
         ;;
     14)
-        check_install && status s-ui
+        check_install && status ss-ui
         ;;
     15)
-        check_install && show_log s-ui
+        check_install && show_log ss-ui
         ;;
     16)
-        check_install && enable s-ui
+        check_install && enable ss-ui
         ;;
     17)
-        check_install && disable s-ui
+        check_install && disable ss-ui
         ;;
     18)
         bbr_menu
@@ -1008,25 +1012,25 @@ show_menu() {
 if [[ $# > 0 ]]; then
     case $1 in
     "start")
-        check_install 0 && start s-ui 0
+        check_install 0 && start ss-ui 0
         ;;
     "stop")
-        check_install 0 && stop s-ui 0
+        check_install 0 && stop ss-ui 0
         ;;
     "restart")
-        check_install 0 && restart s-ui 0
+        check_install 0 && restart ss-ui 0
         ;;
     "status")
         check_install 0 && status 0
         ;;
     "enable")
-        check_install 0 && enable s-ui 0
+        check_install 0 && enable ss-ui 0
         ;;
     "disable")
-        check_install 0 && disable s-ui 0
+        check_install 0 && disable ss-ui 0
         ;;
     "log")
-        check_install 0 && show_log s-ui 0
+        check_install 0 && show_log ss-ui 0
         ;;
     "update")
         check_install 0 && update 0

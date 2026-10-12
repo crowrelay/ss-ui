@@ -16,6 +16,7 @@ import (
 	"github.com/alireza0/s-ui/logger"
 
 	"github.com/sagernet/sing-box/common/tls"
+	sbSudoku "github.com/sagernet/sing-box/transport/sudoku"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/host"
@@ -220,9 +221,22 @@ func (s *ServerService) GenKeypair(keyType string, options string) []string {
 		return s.generateWireGuardKey(options)
 	case "openvpn":
 		return s.generateOpenVPNStaticKey()
+	case "sudoku":
+		return s.generateSudokuKeypair()
 	}
 
 	return []string{"Failed to generate keypair"}
+}
+
+// generateSudokuKeypair returns {privateKey, publicKey}. The pair is produced by
+// the core's own generator so the format always matches the sudoku inbound and
+// outbound options.
+func (s *ServerService) generateSudokuKeypair() []string {
+	privateKey, publicKey, err := sbSudoku.GenKeyPair()
+	if err != nil {
+		return []string{"Failed to generate Sudoku keypair: ", err.Error()}
+	}
+	return []string{privateKey, publicKey}
 }
 
 func (s *ServerService) generateECHKeyPair(serverName string) []string {

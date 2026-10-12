@@ -1,9 +1,9 @@
 ---
 services:
-  s-ui:
-    image: alireza7/s-ui
-    container_name: s-ui
-    hostname: "s-ui"
+  ss-ui:
+    image: ghcr.io/crowrelay/ss-ui
+    container_name: ss-ui
+    hostname: "ss-ui"
     volumes:
       - "./db:/app/db"
       - "./cert:/app/cert"
@@ -13,10 +13,9 @@ services:
       - "2095:2095"
       - "2096:2096"
     networks:
-      - s-ui
+      - ss-ui
     entrypoint: "./entrypoint.sh"
 
 networks:
-  s-ui:
+  ss-ui:
     driver: bridge
-  

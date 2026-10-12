@@ -170,7 +170,7 @@ func ImportDB(file multipart.File) error {
 	return nil
 }
 
-// validateImport rejects a SQLite file that is not an s-ui database, before it
+// validateImport rejects a SQLite file that is not an ss-ui database, before it
 // can replace the live one.
 func validateImport(path string) error {
 	candidate, err := gorm.Open(sqlite.Open(path), &gorm.Config{Logger: gormlogger.Discard})
@@ -187,7 +187,7 @@ func validateImport(path string) error {
 	// and inbounds it is not a panel backup whatever else it holds.
 	for _, required := range []string{"settings", "clients", "inbounds"} {
 		if !candidate.Migrator().HasTable(required) {
-			return common.NewErrorf("Not an s-ui database: table %q is missing", required)
+			return common.NewErrorf("Not an ss-ui database: table %q is missing", required)
 		}
 	}
 	return nil

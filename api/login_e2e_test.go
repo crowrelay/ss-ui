@@ -39,7 +39,7 @@ func loginEngine(t *testing.T) *gin.Engine {
 	engine := gin.New()
 	store := cookie.NewStore([]byte("test-secret-not-used-anywhere-else"))
 	store.Options(BaseSessionOptions(0))
-	engine.Use(sessions.Sessions("s-ui", store))
+	engine.Use(sessions.Sessions("ss-ui", store))
 
 	apiv2 := NewAPIv2Handler(engine.Group("/apiv2"))
 	NewAPIHandler(engine.Group("/api", middleware.SameOrigin()), apiv2)
@@ -49,11 +49,11 @@ func loginEngine(t *testing.T) *gin.Engine {
 func findSessionCookie(t *testing.T, resp *http.Response) *http.Cookie {
 	t.Helper()
 	for _, c := range resp.Cookies() {
-		if c.Name == "s-ui" {
+		if c.Name == "ss-ui" {
 			return c
 		}
 	}
-	t.Fatalf("no s-ui cookie in the login response (status %d, cookies %v)", resp.StatusCode, resp.Cookies())
+	t.Fatalf("no ss-ui cookie in the login response (status %d, cookies %v)", resp.StatusCode, resp.Cookies())
 	return nil
 }
 

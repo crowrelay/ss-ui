@@ -51,6 +51,7 @@ func ParseCmd() {
 		fmt.Println("Commands:")
 		fmt.Println("    admin          set/reset/show first admin credentials")
 		fmt.Println("    uri            Show panel URI")
+		fmt.Println("    generate       generate Sudoku keys (sudoku-keypair)")
 		fmt.Println("    migrate        migrate form older version")
 		fmt.Println("    setting        set/reset/show settings")
 		fmt.Println("    healthcheck    exit 0 if the panel is listening on its configured port")
@@ -65,12 +66,19 @@ func ParseCmd() {
 
 	flag.Parse()
 	if showVersion {
-		fmt.Println("S-UI Panel\t", config.GetVersion())
+		fmt.Println("ss-ui Panel\t", config.GetVersion())
 		info, ok := debug.ReadBuildInfo()
 		if ok {
 			for _, dep := range info.Deps {
 				if dep.Path == "github.com/sagernet/sing-box" {
-					fmt.Println("Sing-Box\t", dep.Version)
+					// When the core is swapped for the Sudoku fork through a
+					// replace directive, the fork tag lives in dep.Replace and
+					// dep.Version still reports the upstream version it replaces.
+					version := dep.Version
+					if dep.Replace != nil {
+						version = dep.Replace.Version
+					}
+					fmt.Println("Sing-Box(Sudoku)\t", version)
 					break
 				}
 			}
@@ -97,6 +105,18 @@ func ParseCmd() {
 
 	case "uri":
 		getPanelURI()
+
+	case "generate":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: generate sudoku-keypair")
+			return
+		}
+		switch os.Args[2] {
+		case "sudoku-keypair":
+			generateSudokuKeyPair()
+		default:
+			fmt.Println("Unknown generate target:", os.Args[2])
+		}
 
 	case "healthcheck":
 		healthCheck()

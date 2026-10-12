@@ -2,10 +2,10 @@
 set -e
 
 DB_FOLDER="${SUI_DB_FOLDER:-/app/db}"
-DB_PATH="${DB_FOLDER}/s-ui.db"
+DB_PATH="${DB_FOLDER}/ss-ui.db"
 
 if [ -f "$DB_PATH" ]; then
-	./sui migrate
+	./ss-ui migrate
 fi
 
 # Run unprivileged when the operator asks for it.
@@ -24,10 +24,10 @@ if [ -n "$SUI_UID" ]; then
 		echo "entrypoint: SUI_UID is set but this container is not running as root; ignoring" >&2
 	else
 		mkdir -p "$DB_FOLDER"
-		chown -R "${SUI_UID}:${SUI_GID}" "$DB_FOLDER" /app/sui /app/libcronet.so 2>/dev/null || true
+		chown -R "${SUI_UID}:${SUI_GID}" "$DB_FOLDER" /app/ss-ui /app/libcronet.so 2>/dev/null || true
 		echo "entrypoint: dropping to uid ${SUI_UID}:${SUI_GID}"
-		exec su-exec "${SUI_UID}:${SUI_GID}" ./sui
+		exec su-exec "${SUI_UID}:${SUI_GID}" ./ss-ui
 	fi
 fi
 
-exec ./sui
+exec ./ss-ui

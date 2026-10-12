@@ -54,7 +54,7 @@ func resetAdmin(assumeYes bool) {
 		return
 	}
 	fmt.Println("reset admin credentials success")
-	fmt.Println("Change them now: s-ui admin -username <user> -password <pass>")
+	fmt.Println("Change them now: ss-ui admin -username <user> -password <pass>")
 }
 
 func updateAdmin(username string, password string) {
@@ -94,5 +94,5 @@ func showAdmin() {
 	fmt.Println("First admin credentials:")
 	fmt.Println("\tUsername:\t", username)
 	fmt.Println("\tPassword:\t <hashed, not recoverable>")
-	fmt.Println("To set a new password, run: s-ui admin -username <user> -password <pass>")
+	fmt.Println("To set a new password, run: ss-ui admin -username <user> -password <pass>")
 }

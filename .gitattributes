@@ -1,0 +1,4 @@
+# Keep our frontend fork when merging upstream s-ui. Upstream changes the
+# frontend submodule pointer on most releases; this makes git keep ours instead
+# of conflicting, and the sync workflow refreshes it from our fork explicitly.
+frontend merge=ours

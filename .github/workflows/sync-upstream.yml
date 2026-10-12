@@ -1,0 +1,175 @@
+name: Sync upstream and release
+
+# Fully automatic: pulls the latest sudoku-sing-box core into go.mod, merges the
+# latest s-ui upstream, and publishes a release. Runs daily, on demand, or when
+# another repository dispatches the "upstream-update" event.
+#
+# The sudoku core pin is always bumped when a new tag exists. The upstream s-ui
+# merge is best-effort with `-X ours`, so files this fork has customised (the
+# build scripts, README, the frontend submodule pointer) keep our version while
+# everything else takes upstream's. A genuine conflict aborts the merge, still
+# releases the core bump, and opens an issue for a human.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [upstream-update]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+env:
+  SUDOKU_REPO: SUDOKU-ASCII/sudoku-sing-box
+  UPSTREAM_REPO: alireza0/s-ui
+
+jobs:
+  sync:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # The driver named in .gitattributes; exits 0 and keeps our side.
+          git config merge.ours.driver true
+
+      - name: Resolve latest sudoku core tag and current pin
+        id: sudoku
+        run: |
+          set -euo pipefail
+          latest=$(git ls-remote --tags --refs "https://github.com/${SUDOKU_REPO}.git" \
+            | awk '{print $2}' | sed 's#refs/tags/##' \
+            | grep -E '^v.*-sudoku\.' | sort -V | tail -n1)
+          [ -n "$latest" ] || { echo "no sudoku tag found" >&2; exit 1; }
+          current=$(grep -oE 'sudoku-sing-box v[^[:space:]]+' go.mod | head -n1 | awk '{print $2}')
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "current=${current}" >> "$GITHUB_OUTPUT"
+          echo "sudoku core: current=${current} latest=${latest}"
+
+      - name: Fetch upstream s-ui
+        run: |
+          set -euo pipefail
+          git remote add upstream "https://github.com/${UPSTREAM_REPO}.git" 2>/dev/null \
+            || git remote set-url upstream "https://github.com/${UPSTREAM_REPO}.git"
+          git fetch upstream --tags
+
+      - name: Decide whether anything changed
+        id: decide
+        run: |
+          set -euo pipefail
+          behind=$(git rev-list --count HEAD..upstream/master)
+          echo "commits behind upstream/master: ${behind}"
+          changed=false
+          [ "${{ steps.sudoku.outputs.latest }}" != "${{ steps.sudoku.outputs.current }}" ] && changed=true
+          [ "${behind}" -gt 0 ] && changed=true
+          echo "behind=${behind}" >> "$GITHUB_OUTPUT"
+          echo "changed=${changed}" >> "$GITHUB_OUTPUT"
+          echo "changed=${changed}"
+
+      - name: Merge upstream s-ui (best effort)
+        id: merge
+        if: steps.decide.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          conflict=false
+          if [ "${{ steps.decide.outputs.behind }}" -gt 0 ]; then
+            # -X ours: overlapping hunks keep this fork's version; non-overlapping
+            # upstream changes merge normally.
+            if ! git merge --no-edit -X ours upstream/master; then
+              git merge --abort || true
+              conflict=true
+              echo "upstream merge hit a conflict; aborting and continuing with the core bump only" >&2
+            fi
+          fi
+          echo "conflict=${conflict}" >> "$GITHUB_OUTPUT"
+
+      - name: Refresh frontend submodule from our fork
+        if: steps.decide.outputs.changed == 'true'
+        run: |
+          # frontend is merge=ours, so pull its own fork's latest main here.
+          git submodule update --remote --merge frontend || true
+
+      - name: Bump sudoku core pin
+        if: steps.decide.outputs.changed == 'true' && steps.sudoku.outputs.latest != steps.sudoku.outputs.current
+        run: |
+          set -euo pipefail
+          sed -i -E "s#(sudoku-sing-box )v[^[:space:]]+#\1${{ steps.sudoku.outputs.latest }}#" go.mod
+          grep 'sudoku-sing-box' go.mod
+          go mod tidy
+
+      - name: Build sanity check
+        if: steps.decide.outputs.changed == 'true'
+        run: |
+          set -e
+          go mod download
+          . ./build-tags.sh
+          TAGS=$(tags_for test)
+          go build -tags "$TAGS" ./...
+          go test -tags "$TAGS" ./core/... ./util/...
+
+      - name: Commit, push and tag
+        id: release
+        if: steps.decide.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "nothing to commit after sync"
+            echo "tagged=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add -A
+          git commit -m "chore: sync upstream s-ui + sudoku core ${{ steps.sudoku.outputs.latest }}"
+          git push origin HEAD:main
+          # A tag is what makes release.yml publish; a branch push only builds.
+          tag="v$(cat config/version)-sudoku.$(date -u +%Y%m%d%H%M)"
+          git tag -a "$tag" -m "ss-ui $tag"
+          git push origin "$tag"
+          echo "tagged=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Open an issue when the upstream merge conflicted
+        if: steps.merge.outputs.conflict == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Upstream s-ui sync conflict needs a human';
+            const body = [
+              'The automatic upstream merge conflicted and was aborted, so only the',
+              'sudoku core pin was updated. Resolve the conflict manually:',
+              '',
+              '```',
+              'git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git',
+              'git fetch upstream',
+              'git merge upstream/master',
+              '```',
+            ].join('\n');
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'sync-conflict',
+            });
+            if (existing.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['sync-conflict'],
+              });
+            }
+
+      - name: Summary
+        run: |
+          echo "changed=${{ steps.decide.outputs.changed }} conflict=${{ steps.merge.outputs.conflict }} tag=${{ steps.release.outputs.tagged }}"

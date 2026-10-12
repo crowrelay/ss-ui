@@ -1,6 +1,6 @@
-# Contributing to S-UI
+# Contributing to ss-ui
 
-Thank you for your interest in contributing to S-UI. This document explains how to set up a development environment, follow project conventions, and submit changes. Your contributions help make the **multi-inbound-per-user** approach and the rest of the project better for everyone.
+Thank you for your interest in contributing to ss-ui. This document explains how to set up a development environment, follow project conventions, and submit changes. Your contributions help make the **multi-inbound-per-user** approach and the rest of the project better for everyone.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ Please be respectful and constructive when interacting with maintainers and othe
 
 ### Prerequisites
 
-- **Go**: 1.25 or later (see `go.mod` for the exact version).
+- **Go**: 1.27 or later (see `go.mod` for the exact version).
 - **Git**: For cloning and submodules.
 - **C compiler**: Required for CGO (e.g. `gcc`, `musl-dev` on Alpine).
 - **Node.js** (optional): Only if you plan to work on or rebuild the frontend. The repo can be run with pre-built frontend assets.
@@ -33,8 +33,8 @@ Please be respectful and constructive when interacting with maintainers and othe
 ### Clone and Submodules
 
 ```bash
-git clone https://github.com/alireza0/s-ui
-cd s-ui
+git clone https://github.com/crowrelay/ss-ui
+cd ss-ui
 git submodule update --init --recursive
 ```
 
@@ -48,13 +48,13 @@ The **frontend** lives in a submodule. If you only work on the backend, you can 
    ./runSUI.sh
    ```
 
-   This runs `./build.sh` then `SUI_DB_FOLDER="db" SUI_DEBUG=true ./sui`.
+   This runs `./build.sh` then `SUI_DB_FOLDER="db" SUI_DEBUG=true ./ss-ui`.
 
 2. Or build manually:
 
    ```bash
    ./build.sh
-   SUI_DB_FOLDER=db SUI_DEBUG=true ./sui
+   SUI_DB_FOLDER=db SUI_DEBUG=true ./ss-ui
    ```
 
    Default panel: **http://localhost:2095/app/** (user: `admin`, password: `admin` — change in production).
@@ -77,13 +77,13 @@ The **frontend** lives in a submodule. If you only work on the backend, you can 
    rm -rf web/html/*
    cp -R frontend/dist/* web/html/
    . ./build-tags.sh
-   go build -ldflags "$(ldflags_for dev)" -tags "$(tags_for dev)" -o sui main.go
+   go build -ldflags "$(ldflags_for dev)" -tags "$(tags_for dev)" -o ss-ui main.go
    ```
 
 3. Run:
 
    ```bash
-   SUI_DB_FOLDER=db SUI_DEBUG=true ./sui
+   SUI_DB_FOLDER=db SUI_DEBUG=true ./ss-ui
    ```
 
 ### Build Tags
@@ -116,10 +116,10 @@ documents the per-platform deltas (Windows and Docker swap `with_musl` for `with
 ### Docker (optional)
 
 ```bash
-git clone https://github.com/alireza0/s-ui
-cd s-ui
+git clone https://github.com/crowrelay/ss-ui
+cd ss-ui
 git submodule update --init --recursive
-docker build -t s-ui .
+docker build -t ss-ui .
 # or: docker compose up -d
 ```
 
@@ -228,7 +228,7 @@ Community help is especially valuable in these areas. Check the [Issues](https:/
 
 ### High-Value Areas
 
-- **Multi-inbound per user**: Core differentiator of S-UI; improvements to UX, docs, and robustness are welcome.
+- **Multi-inbound per user**: Core differentiator of ss-ui; improvements to UX, docs, and robustness are welcome.
 - **API (v1 and v2)**: Completeness, consistency, and documentation (see [API Documentation](https://github.com/alireza0/s-ui/wiki/API-Documentation)).
 - **Subscription service**: Link conversion, JSON subscription, and info endpoints (`sub/`, `util/`).
 - **Testing**: Adding unit and integration tests for critical paths.
@@ -300,7 +300,7 @@ If you maintain a fork or your own repository and want the contribution guide to
    In the repository **Settings → General → Features**, ensure “Issues” (and optionally “Discussions”) are enabled. The link to `CONTRIBUTING.md` appears when users create a new issue or PR; no extra config is needed as long as the file is in the root.
 
 4. **When forking**  
-   If you fork S-UI, `CONTRIBUTING.md` is already in the repo. Update the clone URLs and repo names in this file if you want your fork’s contribution instructions to point to your own repository.
+   If you fork ss-ui, `CONTRIBUTING.md` is already in the repo. Update the clone URLs and repo names in this file if you want your fork’s contribution instructions to point to your own repository.
 
 ---
 
@@ -312,4 +312,4 @@ If you maintain a fork or your own repository and want the contribution guide to
 
 ---
 
-Thank you for helping S-UI grow. Your contributions make it possible for more users to adopt S-UI in production and benefit from its multi-inbound-per-user design.
+Thank you for helping ss-ui grow. Your contributions make it possible for more users to adopt ss-ui in production and benefit from its multi-inbound-per-user design.

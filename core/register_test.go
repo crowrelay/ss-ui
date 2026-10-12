@@ -27,6 +27,8 @@ func TestInboundRegistry(t *testing.T) {
 		C.TypeTUIC, C.TypeShadowTLS, C.TypeNaive, C.TypeTun, C.TypeDirect,
 		// new in 1.14
 		C.TypeSnell, C.TypeCloudflared,
+		// ss-ui: sudoku core
+		C.TypeSudoku,
 	)
 }
 
@@ -38,6 +40,8 @@ func TestOutboundRegistry(t *testing.T) {
 		C.TypeHysteria, C.TypeHysteria2, C.TypeTUIC,
 		// new in 1.14
 		C.TypeSnell, C.TypeBridge,
+		// ss-ui: sudoku core
+		C.TypeSudoku,
 	)
 }
 

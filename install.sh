@@ -7,6 +7,10 @@ plain='\033[0m'
 
 cur_dir=$(pwd)
 
+# The GitHub repository that hosts the ss-ui releases. Override it when the fork
+# lives elsewhere: SS_UI_REPO=owner/repo bash <(curl -Ls .../install.sh)
+SS_UI_REPO="${SS_UI_REPO:-crowrelay/ss-ui}"
+
 #############################################
 # Localization
 #
@@ -69,17 +73,17 @@ d en creds_failed "Failed to set the admin credentials."
 d en current_creds "Your current admin credentials:"
 d en cancelled "cancel..."
 d en fresh_random "this is a fresh installation, will generate random login info for security concerns:"
-d en forgot_info "if you forgot your login info, you can type s-ui for configuration menu"
-d en upgrade_keep "this is your upgrade, will keep old settings. If you forgot your login info, you can type s-ui for configuration menu"
+d en forgot_info "if you forgot your login info, you can type ss-ui for configuration menu"
+d en upgrade_keep "this is your upgrade, will keep old settings. If you forgot your login info, you can type ss-ui for configuration menu"
 d en stopping_singbox "Stopping sing-box service..."
 d en bin_exists "directory exists yet! Please check the content and delete it manually after migration"
-d en got_version "Got s-ui latest version: %s, beginning the installation..."
-d en fetch_fail "Failed to fetch s-ui version, it maybe due to Github API restrictions, please try it later"
-d en download_fail "Downloading s-ui failed, please be sure that your server can access Github"
-d en begin_install "Beginning the install s-ui v%s"
-d en download_ver_fail "download s-ui v%s failed, please check the version exists"
-d en extract_fail "Extracting s-ui failed, the archive may be corrupt or the disk is full"
-d en broken_bin "The installed s-ui binary does not run, the installation is incomplete"
+d en got_version "Got ss-ui latest version: %s, beginning the installation..."
+d en fetch_fail "Failed to fetch ss-ui version, it maybe due to Github API restrictions, please try it later"
+d en download_fail "Downloading ss-ui failed, please be sure that your server can access Github"
+d en begin_install "Beginning the install ss-ui v%s"
+d en download_ver_fail "download ss-ui v%s failed, please check the version exists"
+d en extract_fail "Extracting ss-ui failed, the archive may be corrupt or the disk is full"
+d en broken_bin "The installed ss-ui binary does not run, the installation is incomplete"
 d en install_finished "installation finished, it is up and running now..."
 d en access_panel "You may access the Panel with following URL(s):"
 d en executing "Executing..."
@@ -108,17 +112,17 @@ d fa creds_failed "تنظیم نام کاربری و رمز ادمین نامو�
 d fa current_creds "اطلاعات ورود ادمین فعلی شما:"
 d fa cancelled "لغو شد..."
 d fa fresh_random "این یک نصب تازه است؛ برای امنیت، اطلاعات ورود تصادفی ساخته می شود:"
-d fa forgot_info "اگر اطلاعات ورود را فراموش کردید، دستور s-ui را برای منوی تنظیمات اجرا کنید"
-d fa upgrade_keep "این یک ارتقا است و تنظیمات قبلی حفظ می شود. اگر اطلاعات ورود را فراموش کردید، دستور s-ui را برای منوی تنظیمات اجرا کنید"
+d fa forgot_info "اگر اطلاعات ورود را فراموش کردید، دستور ss-ui را برای منوی تنظیمات اجرا کنید"
+d fa upgrade_keep "این یک ارتقا است و تنظیمات قبلی حفظ می شود. اگر اطلاعات ورود را فراموش کردید، دستور ss-ui را برای منوی تنظیمات اجرا کنید"
 d fa stopping_singbox "در حال متوقف کردن سرویس sing-box..."
 d fa bin_exists "پوشه هنوز وجود دارد! لطفاً محتوای آن را بررسی و پس از مهاجرت به صورت دستی حذف کنید"
-d fa got_version "آخرین نسخهٔ s-ui دریافت شد: %s، شروع نصب..."
-d fa fetch_fail "دریافت نسخهٔ s-ui ناموفق بود؛ ممکن است به دلیل محدودیت های Github API باشد، بعداً دوباره تلاش کنید"
-d fa download_fail "دانلود s-ui ناموفق بود؛ مطمئن شوید سرور شما به Github دسترسی دارد"
-d fa begin_install "شروع نصب s-ui نسخهٔ v%s"
-d fa download_ver_fail "دانلود s-ui نسخهٔ v%s ناموفق بود؛ لطفاً از وجود این نسخه مطمئن شوید"
-d fa extract_fail "استخراج s-ui ناموفق بود؛ ممکن است فایل خراب باشد یا فضای دیسک پر باشد"
-d fa broken_bin "باینری نصب‌شدهٔ s-ui اجرا نمی‌شود؛ نصب ناقص است"
+d fa got_version "آخرین نسخهٔ ss-ui دریافت شد: %s، شروع نصب..."
+d fa fetch_fail "دریافت نسخهٔ ss-ui ناموفق بود؛ ممکن است به دلیل محدودیت های Github API باشد، بعداً دوباره تلاش کنید"
+d fa download_fail "دانلود ss-ui ناموفق بود؛ مطمئن شوید سرور شما به Github دسترسی دارد"
+d fa begin_install "شروع نصب ss-ui نسخهٔ v%s"
+d fa download_ver_fail "دانلود ss-ui نسخهٔ v%s ناموفق بود؛ لطفاً از وجود این نسخه مطمئن شوید"
+d fa extract_fail "استخراج ss-ui ناموفق بود؛ ممکن است فایل خراب باشد یا فضای دیسک پر باشد"
+d fa broken_bin "باینری نصب‌شدهٔ ss-ui اجرا نمی‌شود؛ نصب ناقص است"
 d fa install_finished "نصب به پایان رسید و هم اکنون در حال اجراست..."
 d fa access_panel "می توانید از طریق آدرس (های) زیر به پنل دسترسی داشته باشید:"
 d fa executing "در حال اجرا..."
@@ -147,17 +151,17 @@ d ru creds_failed "Не удалось задать учётные данные 
 d ru current_creds "Ваши текущие учётные данные администратора:"
 d ru cancelled "отмена..."
 d ru fresh_random "это новая установка, в целях безопасности будут сгенерированы случайные данные для входа:"
-d ru forgot_info "если вы забыли данные для входа, введите s-ui для меню настроек"
-d ru upgrade_keep "это обновление, старые настройки сохранятся. Если вы забыли данные для входа, введите s-ui для меню настроек"
+d ru forgot_info "если вы забыли данные для входа, введите ss-ui для меню настроек"
+d ru upgrade_keep "это обновление, старые настройки сохранятся. Если вы забыли данные для входа, введите ss-ui для меню настроек"
 d ru stopping_singbox "Остановка службы sing-box..."
 d ru bin_exists "каталог всё ещё существует! Проверьте содержимое и удалите его вручную после миграции"
-d ru got_version "Получена последняя версия s-ui: %s, начинается установка..."
-d ru fetch_fail "Не удалось получить версию s-ui, возможно из-за ограничений Github API, попробуйте позже"
-d ru download_fail "Не удалось загрузить s-ui, убедитесь, что ваш сервер имеет доступ к Github"
-d ru begin_install "Начинается установка s-ui v%s"
-d ru download_ver_fail "загрузка s-ui v%s не удалась, проверьте существование этой версии"
-d ru extract_fail "Не удалось распаковать s-ui: архив повреждён или на диске нет места"
-d ru broken_bin "Установленный файл s-ui не запускается, установка неполная"
+d ru got_version "Получена последняя версия ss-ui: %s, начинается установка..."
+d ru fetch_fail "Не удалось получить версию ss-ui, возможно из-за ограничений Github API, попробуйте позже"
+d ru download_fail "Не удалось загрузить ss-ui, убедитесь, что ваш сервер имеет доступ к Github"
+d ru begin_install "Начинается установка ss-ui v%s"
+d ru download_ver_fail "загрузка ss-ui v%s не удалась, проверьте существование этой версии"
+d ru extract_fail "Не удалось распаковать ss-ui: архив повреждён или на диске нет места"
+d ru broken_bin "Установленный файл ss-ui не запускается, установка неполная"
 d ru install_finished "установка завершена, панель запущена и работает..."
 d ru access_panel "Вы можете получить доступ к панели по следующим URL:"
 d ru executing "Выполнение..."
@@ -186,17 +190,17 @@ d vi creds_failed "Không thể đặt thông tin đăng nhập quản trị."
 d vi current_creds "Thông tin đăng nhập quản trị hiện tại của bạn:"
 d vi cancelled "đã hủy..."
 d vi fresh_random "đây là cài đặt mới, sẽ tạo thông tin đăng nhập ngẫu nhiên vì lý do bảo mật:"
-d vi forgot_info "nếu bạn quên thông tin đăng nhập, hãy gõ s-ui để mở menu cấu hình"
-d vi upgrade_keep "đây là bản nâng cấp, cài đặt cũ sẽ được giữ lại. Nếu quên thông tin đăng nhập, hãy gõ s-ui để mở menu cấu hình"
+d vi forgot_info "nếu bạn quên thông tin đăng nhập, hãy gõ ss-ui để mở menu cấu hình"
+d vi upgrade_keep "đây là bản nâng cấp, cài đặt cũ sẽ được giữ lại. Nếu quên thông tin đăng nhập, hãy gõ ss-ui để mở menu cấu hình"
 d vi stopping_singbox "Đang dừng dịch vụ sing-box..."
 d vi bin_exists "thư mục vẫn tồn tại! Vui lòng kiểm tra nội dung và xóa thủ công sau khi di trú"
-d vi got_version "Đã lấy phiên bản s-ui mới nhất: %s, bắt đầu cài đặt..."
-d vi fetch_fail "Không thể lấy phiên bản s-ui, có thể do giới hạn của Github API, vui lòng thử lại sau"
-d vi download_fail "Tải s-ui thất bại, hãy chắc chắn máy chủ của bạn có thể truy cập Github"
-d vi begin_install "Bắt đầu cài đặt s-ui v%s"
-d vi download_ver_fail "tải s-ui v%s thất bại, vui lòng kiểm tra phiên bản có tồn tại không"
-d vi extract_fail "Giải nén s-ui thất bại, tệp có thể bị hỏng hoặc đĩa đã đầy"
-d vi broken_bin "Tệp s-ui đã cài đặt không chạy được, quá trình cài đặt chưa hoàn tất"
+d vi got_version "Đã lấy phiên bản ss-ui mới nhất: %s, bắt đầu cài đặt..."
+d vi fetch_fail "Không thể lấy phiên bản ss-ui, có thể do giới hạn của Github API, vui lòng thử lại sau"
+d vi download_fail "Tải ss-ui thất bại, hãy chắc chắn máy chủ của bạn có thể truy cập Github"
+d vi begin_install "Bắt đầu cài đặt ss-ui v%s"
+d vi download_ver_fail "tải ss-ui v%s thất bại, vui lòng kiểm tra phiên bản có tồn tại không"
+d vi extract_fail "Giải nén ss-ui thất bại, tệp có thể bị hỏng hoặc đĩa đã đầy"
+d vi broken_bin "Tệp ss-ui đã cài đặt không chạy được, quá trình cài đặt chưa hoàn tất"
 d vi install_finished "cài đặt hoàn tất, hiện đang chạy..."
 d vi access_panel "Bạn có thể truy cập bảng điều khiển qua (các) URL sau:"
 d vi executing "Đang thực thi..."
@@ -225,17 +229,17 @@ d zhcn creds_failed "设置管理员账号密码失败。"
 d zhcn current_creds "您当前的管理员登录信息："
 d zhcn cancelled "已取消..."
 d zhcn fresh_random "这是全新安装，为了安全将生成随机登录信息："
-d zhcn forgot_info "如果忘记登录信息，可以输入 s-ui 打开配置菜单"
-d zhcn upgrade_keep "这是升级，将保留旧设置。如果忘记登录信息，可以输入 s-ui 打开配置菜单"
+d zhcn forgot_info "如果忘记登录信息，可以输入 ss-ui 打开配置菜单"
+d zhcn upgrade_keep "这是升级，将保留旧设置。如果忘记登录信息，可以输入 ss-ui 打开配置菜单"
 d zhcn stopping_singbox "正在停止 sing-box 服务..."
 d zhcn bin_exists "目录仍然存在！请检查内容并在迁移后手动删除"
-d zhcn got_version "已获取 s-ui 最新版本：%s，开始安装..."
-d zhcn fetch_fail "获取 s-ui 版本失败，可能是由于 Github API 限制，请稍后再试"
-d zhcn download_fail "下载 s-ui 失败，请确保您的服务器可以访问 Github"
-d zhcn begin_install "开始安装 s-ui v%s"
-d zhcn download_ver_fail "下载 s-ui v%s 失败，请检查该版本是否存在"
-d zhcn extract_fail "解压 s-ui 失败，压缩包可能已损坏或磁盘空间不足"
-d zhcn broken_bin "已安装的 s-ui 程序无法运行，安装不完整"
+d zhcn got_version "已获取 ss-ui 最新版本：%s，开始安装..."
+d zhcn fetch_fail "获取 ss-ui 版本失败，可能是由于 Github API 限制，请稍后再试"
+d zhcn download_fail "下载 ss-ui 失败，请确保您的服务器可以访问 Github"
+d zhcn begin_install "开始安装 ss-ui v%s"
+d zhcn download_ver_fail "下载 ss-ui v%s 失败，请检查该版本是否存在"
+d zhcn extract_fail "解压 ss-ui 失败，压缩包可能已损坏或磁盘空间不足"
+d zhcn broken_bin "已安装的 ss-ui 程序无法运行，安装不完整"
 d zhcn install_finished "安装完成，现已运行..."
 d zhcn access_panel "您可以通过以下 URL 访问面板："
 d zhcn executing "正在执行..."
@@ -264,17 +268,17 @@ d zhtw creds_failed "設定管理員帳號密碼失敗。"
 d zhtw current_creds "您目前的管理員登入資訊："
 d zhtw cancelled "已取消..."
 d zhtw fresh_random "這是全新安裝，為了安全將產生隨機登入資訊："
-d zhtw forgot_info "如果忘記登入資訊，可以輸入 s-ui 開啟設定選單"
-d zhtw upgrade_keep "這是升級，將保留舊設定。如果忘記登入資訊，可以輸入 s-ui 開啟設定選單"
+d zhtw forgot_info "如果忘記登入資訊，可以輸入 ss-ui 開啟設定選單"
+d zhtw upgrade_keep "這是升級，將保留舊設定。如果忘記登入資訊，可以輸入 ss-ui 開啟設定選單"
 d zhtw stopping_singbox "正在停止 sing-box 服務..."
 d zhtw bin_exists "目錄仍然存在！請檢查內容並在遷移後手動刪除"
-d zhtw got_version "已取得 s-ui 最新版本：%s，開始安裝..."
-d zhtw fetch_fail "取得 s-ui 版本失敗，可能是由於 Github API 限制，請稍後再試"
-d zhtw download_fail "下載 s-ui 失敗，請確保您的伺服器可以存取 Github"
-d zhtw begin_install "開始安裝 s-ui v%s"
-d zhtw download_ver_fail "下載 s-ui v%s 失敗，請檢查該版本是否存在"
-d zhtw extract_fail "解壓 s-ui 失敗，壓縮檔可能已損毀或磁碟空間不足"
-d zhtw broken_bin "已安裝的 s-ui 程式無法執行，安裝不完整"
+d zhtw got_version "已取得 ss-ui 最新版本：%s，開始安裝..."
+d zhtw fetch_fail "取得 ss-ui 版本失敗，可能是由於 Github API 限制，請稍後再試"
+d zhtw download_fail "下載 ss-ui 失敗，請確保您的伺服器可以存取 Github"
+d zhtw begin_install "開始安裝 ss-ui v%s"
+d zhtw download_ver_fail "下載 ss-ui v%s 失敗，請檢查該版本是否存在"
+d zhtw extract_fail "解壓 ss-ui 失敗，壓縮檔可能已損毀或磁碟空間不足"
+d zhtw broken_bin "已安裝的 ss-ui 程式無法執行，安裝不完整"
 d zhtw install_finished "安裝完成，現已執行..."
 d zhtw access_panel "您可以透過以下 URL 存取面板："
 d zhtw executing "正在執行..."
@@ -348,7 +352,7 @@ install_base() {
         zypper refresh && zypper -q install -y wget curl tar
         ;;
     alpine)
-        # Alpine uses apk and OpenRC; bash is needed for the s-ui menu script.
+        # Alpine uses apk and OpenRC; bash is needed for the ss-ui menu script.
         apk update && apk add --no-cache wget curl tar bash openrc
         ;;
     *)
@@ -359,16 +363,16 @@ install_base() {
 
 # Write an OpenRC service definition (Alpine and other OpenRC systems).
 install_openrc_service() {
-    cat >/etc/init.d/s-ui <<'EOF'
+    cat >/etc/init.d/ss-ui <<'EOF'
 #!/sbin/openrc-run
 
-description="s-ui Service"
-command="/usr/local/s-ui/sui"
+description="ss-ui Service"
+command="/usr/local/ss-ui/ss-ui"
 command_background=true
-directory="/usr/local/s-ui"
-pidfile="/run/s-ui.pid"
-output_log="/var/log/s-ui.log"
-error_log="/var/log/s-ui.log"
+directory="/usr/local/ss-ui"
+pidfile="/run/ss-ui.pid"
+output_log="/var/log/ss-ui.log"
+error_log="/var/log/ss-ui.log"
 respawn_delay=10
 supervisor=supervise-daemon
 
@@ -378,12 +382,12 @@ depend() {
     after net firewall
 }
 EOF
-    chmod +x /etc/init.d/s-ui
+    chmod +x /etc/init.d/ss-ui
 }
 
 config_after_install() {
     echo -e "${yellow}$(t migrating)${plain}"
-    /usr/local/s-ui/sui migrate
+    /usr/local/ss-ui/ss-ui migrate
 
     echo -e "${yellow}$(t finished_modify)${plain}"
     read -r -p "$(t ask_modify)" config_confirm
@@ -406,7 +410,7 @@ config_after_install() {
         [ -z "$config_path" ] || params+=(-path "$config_path")
         [ -z "$config_subPort" ] || params+=(-subPort "$config_subPort")
         [ -z "$config_subPath" ] || params+=(-subPath "$config_subPath")
-        /usr/local/s-ui/sui setting "${params[@]}"
+        /usr/local/ss-ui/ss-ui setting "${params[@]}"
 
         read -r -p "$(t ask_admin)" admin_confirm
         if [[ "${admin_confirm}" == "y" || "${admin_confirm}" == "Y" ]]; then
@@ -426,17 +430,17 @@ config_after_install() {
 
             # Set credentials
             echo -e "${yellow}$(t initializing)${plain}"
-            if ! /usr/local/s-ui/sui admin -username "${config_account}" -password "${config_password}"; then
+            if ! /usr/local/ss-ui/ss-ui admin -username "${config_account}" -password "${config_password}"; then
                 echo -e "${red}$(t creds_failed)${plain}"
                 exit 1
             fi
         else
             echo -e "${yellow}$(t current_creds)${plain}"
-            /usr/local/s-ui/sui admin -show
+            /usr/local/ss-ui/ss-ui admin -show
         fi
     else
         echo -e "${red}$(t cancelled)${plain}"
-        if [[ ! -f "/usr/local/s-ui/db/s-ui.db" ]]; then
+        if [[ ! -f "/usr/local/ss-ui/db/ss-ui.db" ]]; then
             local usernameTemp=$(head -c 6 /dev/urandom | base64)
             local passwordTemp=$(head -c 6 /dev/urandom | base64)
             echo -e "$(t fresh_random)"
@@ -445,7 +449,7 @@ config_after_install() {
             echo -e "${green}password:${passwordTemp}${plain}"
             echo -e "###############################################"
             echo -e "${red}$(t forgot_info)${plain}"
-            if ! /usr/local/s-ui/sui admin -username "${usernameTemp}" -password "${passwordTemp}"; then
+            if ! /usr/local/ss-ui/ss-ui admin -username "${usernameTemp}" -password "${passwordTemp}"; then
                 echo -e "${red}$(t creds_failed)${plain}"
                 exit 1
             fi
@@ -460,12 +464,12 @@ prepare_services() {
         if [[ -f "/etc/systemd/system/sing-box.service" ]]; then
             echo -e "${yellow}$(t stopping_singbox)${plain}"
             systemctl stop sing-box
-            rm -f /usr/local/s-ui/bin/sing-box /usr/local/s-ui/bin/runSingbox.sh /usr/local/s-ui/bin/signal
+            rm -f /usr/local/ss-ui/bin/sing-box /usr/local/ss-ui/bin/runSingbox.sh /usr/local/ss-ui/bin/signal
         fi
     fi
-    if [[ -e "/usr/local/s-ui/bin" ]]; then
+    if [[ -e "/usr/local/ss-ui/bin" ]]; then
         echo -e "###############################################################"
-        echo -e "${green}/usr/local/s-ui/bin${red} $(t bin_exists)${plain}"
+        echo -e "${green}/usr/local/ss-ui/bin${red} $(t bin_exists)${plain}"
         echo -e "###############################################################"
     fi
     if [[ "${init_system}" == "systemd" ]]; then
@@ -514,19 +518,19 @@ verify_checksum() {
     echo -e "${green}$(t checksum_ok)${plain}"
 }
 
-install_s-ui() {
+install_ss-ui() {
     # A private directory, not /tmp itself. The old path was predictable, so on
     # a shared host another user could pre-create the archive or the extracted
     # tree and have root install it.
-    workdir=$(mktemp -d "${TMPDIR:-/tmp}/s-ui-install.XXXXXXXX") || exit 1
+    workdir=$(mktemp -d "${TMPDIR:-/tmp}/ss-ui-install.XXXXXXXX") || exit 1
     trap 'rm -rf "$workdir"' EXIT
     cd "$workdir" || exit 1
 
-    local archive="$workdir/s-ui-linux-$(arch).tar.gz"
+    local archive="$workdir/ss-ui-linux-$(arch).tar.gz"
     local sums="$workdir/SHA256SUMS"
 
     if [ $# == 0 ]; then
-        last_version=$(curl -Ls "https://api.github.com/repos/alireza0/s-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+        last_version=$(curl -Ls "https://api.github.com/repos/${SS_UI_REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
             echo -e "${red}$(t fetch_fail)${plain}"
             exit 1
@@ -540,8 +544,8 @@ install_s-ui() {
     # No --no-check-certificate. It was on every download here, which turns the
     # whole install into an unauthenticated fetch: anyone able to intercept it
     # chooses the binary that then runs as root.
-    local base="https://github.com/alireza0/s-ui/releases/download/${last_version}"
-    if ! fetch "${base}/s-ui-linux-$(arch).tar.gz" "$archive"; then
+    local base="https://github.com/${SS_UI_REPO}/releases/download/${last_version}"
+    if ! fetch "${base}/ss-ui-linux-$(arch).tar.gz" "$archive"; then
         if [ $# == 0 ]; then
             echo -e "${red}$(t download_fail)${plain}"
         else
@@ -552,11 +556,11 @@ install_s-ui() {
     wget -q -O "$sums" "${base}/SHA256SUMS" 2>/dev/null || : # older releases have none
     verify_checksum "$archive" "$sums" || exit 1
 
-    if [[ -e /usr/local/s-ui/ ]]; then
+    if [[ -e /usr/local/ss-ui/ ]]; then
         if [[ "${init_system}" == "systemd" ]]; then
-            systemctl stop s-ui
+            systemctl stop ss-ui
         elif [[ "${init_system}" == "openrc" ]]; then
-            rc-service s-ui stop 2>/dev/null
+            rc-service ss-ui stop 2>/dev/null
         fi
     fi
 
@@ -567,44 +571,44 @@ install_s-ui() {
     fi
     rm -f "$archive"
 
-    chmod +x s-ui/sui s-ui/s-ui.sh
-    cp s-ui/s-ui.sh /usr/bin/s-ui
-    if ! cp -rf s-ui /usr/local/; then
+    chmod +x ss-ui/ss-ui ss-ui/ss-ui.sh
+    cp ss-ui/ss-ui.sh /usr/bin/ss-ui
+    if ! cp -rf ss-ui /usr/local/; then
         echo -e "${red}$(t extract_fail)${plain}"
         df -h /usr/local 2>/dev/null
-        rm -rf s-ui
+        rm -rf ss-ui
         exit 1
     fi
-    if ! /usr/local/s-ui/sui -v >/dev/null 2>&1; then
+    if ! /usr/local/ss-ui/ss-ui -v >/dev/null 2>&1; then
         echo -e "${red}$(t broken_bin)${plain}"
         df -h /usr/local 2>/dev/null
-        rm -rf s-ui
+        rm -rf ss-ui
         exit 1
     fi
     if [[ "${init_system}" == "systemd" ]]; then
-        cp -f s-ui/*.service /etc/systemd/system/
+        cp -f ss-ui/*.service /etc/systemd/system/
     fi
-    rm -rf s-ui
+    rm -rf ss-ui
 
     config_after_install
     prepare_services
 
     if [[ "${init_system}" == "openrc" ]]; then
         install_openrc_service
-        rc-update add s-ui default
-        rc-service s-ui restart
+        rc-update add ss-ui default
+        rc-service ss-ui restart
     else
-        systemctl enable s-ui --now
+        systemctl enable ss-ui --now
     fi
 
-    printf "${green}s-ui v${last_version}${plain} $(t install_finished)\n"
+    printf "${green}ss-ui v${last_version}${plain} $(t install_finished)\n"
     echo -e "$(t access_panel)${green}"
-    /usr/local/s-ui/sui uri
+    /usr/local/ss-ui/ss-ui uri
     echo -e "${plain}"
     echo -e ""
-    s-ui help
+    ss-ui help
 }
 
 echo -e "${green}$(t executing)${plain}"
 install_base
-install_s-ui $1
+install_ss-ui $1

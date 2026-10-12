@@ -64,8 +64,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            alireza7/s-ui
-            ghcr.io/alireza0/s-ui
+            ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
@@ -74,11 +73,6 @@ jobs:
         uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
       - name: Login to GHCR
         uses: docker/login-action@v4
         with:
@@ -94,8 +88,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
-            alireza7/s-ui
-            ghcr.io/alireza0/s-ui
+            ghcr.io/${{ github.repository }}
           cache-from: type=gha,scope=${{ env.PLATFORM_PAIR }}
           cache-to: ${{ github.ref == 'refs/heads/main' && format('type=gha,scope={0},mode=max', env.PLATFORM_PAIR) || '' }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
@@ -122,11 +115,6 @@ jobs:
           path: ${{ runner.temp }}/digests
           pattern: digests-*
           merge-multiple: true
-      - name: Login to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
       - name: Login to GHCR
         uses: docker/login-action@v4
         with:
@@ -140,8 +128,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            alireza7/s-ui
-            ghcr.io/alireza0/s-ui
+            ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
@@ -152,8 +139,7 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           set -e
-          for img in alireza7/s-ui ghcr.io/alireza0/s-ui; do
-            TAGS_ARGS=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -cr --arg img "$img" '.tags | map(select(startswith($img))) | map("-t " + .) | join(" ")')
-            DIGEST_REFS=$(for f in *; do echo -n "${img}@sha256:$(cat "$f") "; done)
-            docker buildx imagetools create $TAGS_ARGS $DIGEST_REFS
-          done
+          img="ghcr.io/${{ github.repository }}"
+          TAGS_ARGS=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -cr --arg img "$img" '.tags | map(select(startswith($img))) | map("-t " + .) | join(" ")')
+          DIGEST_REFS=$(for f in *; do echo -n "${img}@sha256:$(cat "$f") "; done)
+          docker buildx imagetools create $TAGS_ARGS $DIGEST_REFS

@@ -225,3 +225,10 @@ require (
 	lukechampine.com/blake3 v1.4.1 // indirect
 	zombiezen.com/go/capnproto2 v2.18.2+incompatible // indirect
 )
+
+// ss-ui builds on the Sudoku fork of sing-box instead of the upstream core.
+// The fork keeps the module path github.com/sagernet/sing-box, and its
+// v1.14.2-sudoku.* tags are based on the sing-box 1.14.2 that require pins
+// above, so this is a straight replacement with no import rewrites.
+// The sync-upstream workflow bumps this tag automatically.
+replace github.com/sagernet/sing-box => github.com/SUDOKU-ASCII/sudoku-sing-box v1.14.2-sudoku.0.5.2

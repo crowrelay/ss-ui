@@ -1,9 +1,9 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo Building S-UI for Windows...
+echo Building SS-UI for Windows...
 
-cd /d "%~dp0"
+cd /d "%~dp0\.."
 
 REM Check if Go is installed
 go version >nul 2>&1
@@ -53,11 +53,11 @@ set GOOS=windows
 set GOARCH=amd64
 
 REM Try to build with CGO first
-go build -ldflags "-w -s" -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor,with_tailscale" -o sui.exe main.go
+go build -ldflags "-w -s" -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor,with_tailscale" -o ss-ui.exe main.go
 if errorlevel 1 (
     echo Warning: CGO build failed, trying without CGO...
     set CGO_ENABLED=0
-    go build -ldflags "-w -s" -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor,with_tailscale" -o sui.exe main.go
+    go build -ldflags "-w -s" -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor,with_tailscale" -o ss-ui.exe main.go
     if errorlevel 1 (
         echo Error: Failed to build backend
         pause
@@ -69,5 +69,5 @@ if errorlevel 1 (
 )
 
 echo Build completed successfully!
-echo Output: sui.exe
+echo Output: ss-ui.exe
 pause

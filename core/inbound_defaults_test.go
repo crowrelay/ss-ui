@@ -72,6 +72,10 @@ func TestInboundDefaults(t *testing.T) {
 		// the operator has to paste one in before the inbound will start.
 		{name: "cloudflared", listens: false, options: map[string]any{
 			"type": "cloudflared", "token": cloudflaredTestToken, "protocol": "auto"}},
+		// sudoku requires a non-empty key (a generated key pair or a shared
+		// secret). The panel's Sudoku form generates/pastes one.
+		{name: "sudoku", listens: true, options: map[string]any{
+			"type": "sudoku", "key": "b1ec294d5dba60a800e1ef8c3423d5a176093f0d8c432e01bc24895d6828140a"}},
 	}
 
 	port := 43100

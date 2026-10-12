@@ -1,22 +1,22 @@
 # Windows Files
 
-This directory contains all Windows-specific files for S-UI.
+This directory contains all Windows-specific files for SS-UI.
 
 ## Available Files:
 
-- **s-ui-windows.xml**: Windows Service configuration
+- **ss-ui-windows.xml**: Windows Service configuration
 - **install-windows.bat**: Installation script
-- **s-ui-windows.bat**: Control panel
+- **ss-ui-windows.bat**: Control panel
 - **uninstall-windows.bat**: Uninstallation script
 - **build-windows.bat**: Simple build script for CMD
 - **build-windows.ps1**: Advanced build script for PowerShell
 
 ## Usage:
 
-To install S-UI on Windows:
+To install SS-UI on Windows:
 1. Run `install-windows.bat` as Administrator
 2. Follow the installation wizard
-3. Use `s-ui-windows.bat` for management
+3. Use `ss-ui-windows.bat` for management
 
 To build from source:
 - With CMD: `build-windows.bat`

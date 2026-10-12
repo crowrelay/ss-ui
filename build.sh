@@ -21,4 +21,4 @@ cp -R frontend/dist/* web/html/
 TAGS=$(tags_for dev)
 LDFLAGS=$(ldflags_for dev)
 
-go build -ldflags "$LDFLAGS -extldflags \"-Wl,-no_warn_duplicate_libraries\"" -tags "$TAGS" -o sui main.go
+go build -ldflags "$LDFLAGS -extldflags \"-Wl,-no_warn_duplicate_libraries\"" -tags "$TAGS" -o ss-ui main.go

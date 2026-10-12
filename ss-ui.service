@@ -1,12 +1,12 @@
 [Unit]
-Description=s-ui Service
+Description=ss-ui Service
 After=network.target
 Wants=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/usr/local/s-ui/
-ExecStart=/usr/local/s-ui/sui
+WorkingDirectory=/usr/local/ss-ui/
+ExecStart=/usr/local/ss-ui/ss-ui
 Restart=on-failure
 RestartSec=10s
 
@@ -22,7 +22,7 @@ NoNewPrivileges=true
 # files the backup and import paths create.
 PrivateTmp=true
 
-# read-only rather than true: s-ui.sh installs acme.sh certificates under
+# read-only rather than true: ss-ui.sh installs acme.sh certificates under
 # /root/cert and the panel has to be able to read them. The service never
 # writes there.
 ProtectHome=read-only
