@@ -211,6 +211,11 @@ or from the panel: **Inbounds → Add → type `Sudoku` → the refresh icon nex
 - **Split-key mode:** put the **PublicKey** in the inbound and the **PrivateKey** in the
   client (`out_json`), so a leak of the server config does not leak the client key.
 
+> The panel's **Generate** button does split-key mode for you: it sets the inbound's
+> **Key** to the **public** key and writes the matching **private** key into the client
+> `out_json` (Client tab). Pairing them the other way around makes every connection fail
+> with an EOF on the server.
+
 ### Inbound fields
 
 | Field | Meaning |
