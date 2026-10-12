@@ -206,6 +206,61 @@ func (s *ClashService) ConvertToClashMeta(outbounds *[]map[string]interface{}, b
 			if uot, ok := obMap["udp_over_tcp"].(bool); ok && uot {
 				proxy["udp-over-tcp"] = true
 			}
+		case "sudoku":
+			// The sudoku outbound uses sing-box field names; mihomo wants the
+			// kebab-case ones and a matching table/aead/downlink configuration.
+			proxy["type"] = "sudoku"
+			if key, ok := obMap["key"].(string); ok && key != "" {
+				proxy["key"] = key
+			}
+			if aead, ok := obMap["aead"].(string); ok && aead != "" {
+				proxy["aead-method"] = aead
+			}
+			if table, ok := obMap["ascii"].(string); ok && table != "" {
+				proxy["table-type"] = table
+			}
+			if custom, ok := obMap["custom_table"].(string); ok && custom != "" {
+				proxy["custom-table"] = custom
+			}
+			if customs, ok := obMap["custom_tables"].([]interface{}); ok && len(customs) > 0 {
+				proxy["custom-tables"] = customs
+			}
+			if _, ok := obMap["padding_min"].(float64); ok {
+				proxy["padding-min"] = obMap["padding_min"]
+			}
+			if _, ok := obMap["padding_max"].(float64); ok {
+				proxy["padding-max"] = obMap["padding_max"]
+			}
+			if _, ok := obMap["enable_pure_downlink"].(bool); ok {
+				proxy["enable-pure-downlink"] = obMap["enable_pure_downlink"]
+			}
+			if mux, ok := obMap["multiplex"].(string); ok && mux != "" {
+				proxy["multiplex"] = mux
+			}
+			if hm, ok := obMap["httpmask"].(map[string]interface{}); ok {
+				clashHttpMask := make(map[string]interface{})
+				if v, ok := hm["disable"].(bool); ok {
+					clashHttpMask["disable"] = v
+				}
+				if v, ok := hm["mode"].(string); ok && v != "" {
+					clashHttpMask["mode"] = v
+				}
+				if v, ok := hm["tls"].(bool); ok {
+					clashHttpMask["tls"] = v
+				}
+				if v, ok := hm["host"].(string); ok && v != "" {
+					clashHttpMask["host"] = v
+				}
+				if v, ok := hm["path_root"].(string); ok && v != "" {
+					clashHttpMask["path-root"] = v
+				}
+				if v, ok := hm["multiplex"].(string); ok && v != "" {
+					clashHttpMask["multiplex"] = v
+				}
+				if len(clashHttpMask) > 0 {
+					proxy["httpmask"] = clashHttpMask
+				}
+			}
 		default:
 			continue
 		}
