@@ -108,7 +108,19 @@ jobs:
         run: |
           set -euo pipefail
           SHORT=$(go list -m -f '{{.Version}}' github.com/sagernet/cronet-go | sed 's/.*-//')
-          FULL=$(curl -fsSL "https://api.github.com/repos/SagerNet/cronet-go/commits/${SHORT}" | jq -r '.sha')
+          # Unauthenticated API calls from a runner are rate-limited (the answer
+          # comes back null), which used to fail the whole release. Send the
+          # token and retry.
+          FULL=""
+          for i in 1 2 3 4 5; do
+            FULL=$(curl -fsSL \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/SagerNet/cronet-go/commits/${SHORT}" | jq -r '.sha') || true
+            if [ -n "$FULL" ] && [ "$FULL" != "null" ]; then break; fi
+            echo "could not resolve cronet-go commit ${SHORT} (attempt $i), retrying in $((i * 5))s..." >&2
+            sleep $((i * 5))
+          done
           [ -n "$FULL" ] && [ "$FULL" != "null" ] || { echo "could not resolve cronet-go commit ${SHORT}" >&2; exit 1; }
           echo "cronet-go: $FULL"
           echo "CRONET_COMMIT=$FULL" >> "$GITHUB_ENV"
